@@ -1,0 +1,3 @@
+#!/bin/bash
+rm -f *.d.ts && npx -p typescript tsc ../**/*.js --declaration --allowJs --emitDeclarationOnly --outDir .
+echo "note: errors in node_modules may be safely ignored; the type definitions were successfully generated"

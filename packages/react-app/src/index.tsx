@@ -3,7 +3,7 @@ import "./index.css";
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import { DAppProvider, Mainnet } from "@usedapp/core";
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 
 import App from "./App";
 
@@ -23,13 +23,18 @@ const client = new ApolloClient({
   uri: "https://api.thegraph.com/subgraphs/name/paulrberg/create-eth-app",
 });
 
-ReactDOM.render(
+const root = createRoot((() => {
+  const r = document.getElementById("root");
+  if (r === null) throw new Error("couldn't find root element");
+  return r;
+})());
+
+root.render(
   <React.StrictMode>
-    <DAppProvider config={config}>
-      <ApolloProvider client={client}>
+    <DAppProvider config={config} >
+      <ApolloProvider client={client} >
         <App />
       </ApolloProvider>
     </DAppProvider>
-  </React.StrictMode>,
-  document.getElementById("root"),
+  </React.StrictMode>
 );
