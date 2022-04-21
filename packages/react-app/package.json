@@ -18,19 +18,22 @@
     "@my-app/contracts": "^1.0.0",
     "@apollo/client": "^3.5.10",
     "@ethersproject/contracts": "^5.6.0",
-    "@ethersproject/providers": "^5.6.0",
-    "@testing-library/dom": "^8.11.3",
-    "@testing-library/jest-dom": "^5.16.2",
-    "@testing-library/react": "^12.1.4",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/react": "^17.0.40",
-    "@usedapp/core": "^0.12.1",
+    "@ethersproject/providers": "^5.6.4",
+    "@usedapp/core": "^1.0.0",
     "graphql": "^16.3.0",
-    "ipfs-deploy": "^11.2.0",
-    "react": "17.0.2",
-    "react-dom": "17.0.2",
-    "react-scripts": "4.0.3",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-scripts": "^5.0.1",
     "styled-components": "^5.3.3"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.5",
+    "@types/react-dom": "^18.0.1",
+    "@testing-library/dom": "^8.13",
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^13.1.1",
+    "@testing-library/user-event": "^14.1.1",
+    "ipfs-deploy": "^11.2.0"
   },
   "eslintConfig": {
     "extends": [
