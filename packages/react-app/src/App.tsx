@@ -1,12 +1,10 @@
 import { useQuery } from "@apollo/client";
 import { Contract } from "@ethersproject/contracts";
+import { abis, addresses } from "@my-app/contracts";
 import { shortenAddress, useCall, useEthers, useLookupAddress } from "@usedapp/core";
 import React, { useEffect, useState } from "react";
-
-import { Body, Button, Container, Header, Image, Link } from "./components";
+import { Body, Container, Header } from "./components";
 import logo from "./ethereumLogo.png";
-
-import { addresses, abis } from "@my-app/contracts";
 import GET_TRANSFERS from "./graphql/subgraph";
 
 function WalletButton() {
@@ -32,7 +30,7 @@ function WalletButton() {
   }, [error]);
 
   return (
-    <Button
+    <button
       onClick={() => {
         if (!account) {
           activateBrowserWallet();
@@ -43,7 +41,7 @@ function WalletButton() {
     >
       {rendered === "" && "Connect Wallet"}
       {rendered !== "" && rendered}
-    </Button>
+    </button>
   );
 }
 
@@ -75,15 +73,15 @@ function App() {
         <WalletButton />
       </Header>
       <Body>
-        <Image src={logo} alt="ethereum-logo" />
+        <img src={logo} alt="ethereum-logo" />
         <p>
           Edit <code>packages/react-app/src/App.js</code> and save to reload.
         </p>
-        <Link href="https://reactjs.org">
+        <a href="https://reactjs.org">
           Learn React
-        </Link>
-        <Link href="https://usedapp.io/">Learn useDapp</Link>
-        <Link href="https://thegraph.com/docs/quick-start">Learn The Graph</Link>
+        </a>
+        <a href="https://usedapp.io/">Learn useDapp</a>
+        <a href="https://thegraph.com/docs/quick-start">Learn The Graph</a>
       </Body>
     </Container>
   );
