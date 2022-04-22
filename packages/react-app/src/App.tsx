@@ -30,7 +30,7 @@ function WalletButton() {
   }, [error]);
 
   return (
-    <button
+    <button className="text-3xl font-bold underline border-4 border-dotted border-black"
       onClick={() => {
         if (!account) {
           activateBrowserWallet();
