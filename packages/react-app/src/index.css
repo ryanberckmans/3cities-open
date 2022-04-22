@@ -8,8 +8,9 @@
 @import './testImport';
 
 /* test of tailwindcss/nesting postcss plugin */
+/* TODO - nesting works in the build process, but the linter flags it as an error https://github.com/tailwindlabs/tailwindcss-intellisense/issues/539 */
 body {
   button {
-    @apply bg-orange-400;
+    @apply bg-red-500;
   }
 }
