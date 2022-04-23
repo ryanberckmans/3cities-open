@@ -30,6 +30,7 @@ const root = createRoot((() => {
 })());
 
 root.render(
+  // NB as of React 18, when you use Strict Mode, React renders each component twice to help you find unexpected side effects. If you have React DevTools installed, the second log’s renders will be displayed in grey, and there will be an option (off by default) to suppress them completely
   <React.StrictMode>
     <DAppProvider config={config} >
       <ApolloProvider client={client} >
