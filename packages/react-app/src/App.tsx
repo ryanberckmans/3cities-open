@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 import { Body, Container, Header } from "./components";
 import logo from "./ethereumLogo.png";
 import GET_TRANSFERS from "./graphql/subgraph";
+import useAddressOrENS from "./hooks/useAddressOrENS";
 
 function WalletButton() {
   const [rendered, setRendered] = useState("");
@@ -46,6 +47,8 @@ function WalletButton() {
 }
 
 function App() {
+  const maybeAddressOrENS = useAddressOrENS();
+
   // Read more about useDapp on https://usedapp.io/
   const { error: contractCallError, value: tokenBalance } =
     useCall({
@@ -71,6 +74,7 @@ function App() {
     <Container>
       <Header>
         <WalletButton />
+        {maybeAddressOrENS && <><br/>connected: {maybeAddressOrENS}</>}
       </Header>
       <Body>
         <img src={logo} alt="ethereum-logo" />
