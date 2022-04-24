@@ -34,6 +34,7 @@
     "@typescript-eslint/eslint-plugin": "^5.20.0",
     "@typescript-eslint/parser": "^5.20.0",
     "autoprefixer": "^10.4.4",
+    "env-cmd": "^10.1.0",
     "eslint": "^8.13.0",
     "eslint-plugin-react": "^7.29.4",
     "eslint-plugin-react-hooks": "^4.4.0",
@@ -53,10 +54,18 @@
   },
   "scripts": {
     "analyze": "source-map-explorer 'build/static/js/*.js'",
-    "build": "react-scripts build",
+    "build-raw": "react-scripts build # run a regular build in the context of an env that's already been set",
+    "build:dev": "yarn env-cmd -e dev yarn build-raw # run a production build using dev env, eg. with source maps enabled for use with 'yarn analyze'",
+    "build:prod-test": "yarn env-cmd -e prod-test yarn build-raw",
+    "build:prod": "npx env-cmd -e prod npm run build-raw",
+    "build": "yarn build:prod",
     "eject": "react-scripts eject",
     "ipfs": "yarn build && ipfs-deploy build/",
-    "start": "react-scripts start",
+    "start-raw": "react-scripts start # run dev mode in the context of an env that's already been set",
+    "start:dev": "yarn env-cmd -e dev yarn start-raw",
+    "start:prod-test": "yarn env-cmd -e prod-test yarn start-raw",
+    "start:prod": "yarn env-cmd -e prod yarn start-raw",
+    "start": "yarn start:dev",
     "test": "react-scripts test"
   },
   "license": "MIT"

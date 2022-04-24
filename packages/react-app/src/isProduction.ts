@@ -1,0 +1,3 @@
+
+// isProduction is true if and only if the app is being run in production mode, ie. against production dependencies, eg. to use blockchain mainnets instead of testnets. Note that whether or not the app is being run in production mode (ie. the truthiness of isProduction) is orthogonal to the type of build being used to run the app. The app may be run with isProduction==true while in built in development mode (eg. to debug locally against production dependencies), or the app may be run with isProduction==false in a production minified build (eg. to offer a production deployment against test dependencies for demo purposes)
+export const isProduction: boolean = process.env['REACT_APP_IS_PRODUCTION'] === 'true';
