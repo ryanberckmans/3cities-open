@@ -4,7 +4,6 @@ import { Contract } from "@ethersproject/contracts";
 import { shortenAddress, useCall, useEthers, useLookupAddress } from "@usedapp/core";
 import React, { useEffect, useState } from "react";
 import { Body, Container, Header } from "./components";
-import logo from "./ethereumLogo.png";
 import GET_TRANSFERS from "./graphql/subgraph";
 import useAddressOrENS from "./hooks/useAddressOrENS";
 
@@ -77,15 +76,6 @@ function App() {
         {maybeAddressOrENS && <><br/>connected: {maybeAddressOrENS}</>}
       </Header>
       <Body>
-        <img src={logo} alt="ethereum-logo" />
-        <p>
-          Edit <code>packages/react-app/src/App.js</code> and save to reload.
-        </p>
-        <a href="https://reactjs.org">
-          Learn React
-        </a>
-        <a href="https://usedapp.io/">Learn useDapp</a>
-        <a href="https://thegraph.com/docs/quick-start">Learn The Graph</a>
       </Body>
     </Container>
   );
