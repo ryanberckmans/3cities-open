@@ -48,16 +48,26 @@ export function isObserver<T>(o: T | Observer<T>): o is Observer<T> {
 // re-render, and 3) pass the ObservableValue.observer down the
 // component tree (eg. as props or a React.Context) where it may then
 // be subscribed to by the minimal set of React components which will
-// be re-rendered when the dynamic value is updated.
+// be re-rendered when the dynamic value is updated. NB be aware of
+// the potential need for an explicit gc strategy to avoid
+// subscription memory leaks in the case where ObservableValue is
+// gc'd. There is no mechanism inside ObservableValue to let
+// subscriptions know of its own death/it being gc'd. In a React app,
+// if an ObservableValue is unmounted, gc'd, and later re-mounted,
+// that should automatically trigger to an update inside React to any
+// observer passed as props or in a React.Context, and if downstream
+// React components/subscriptions are properly unsubscribing on change
+// of observer (as is done in useObservedValue), then this should
+// avoid memory leaks in the case where ObservableValue is gc'd.
 export interface ObservableValue<T> {
   getCurrentValue: () => T, // current value of type T. Must be called by new clients if they want the current value because only new/future values are pushed into the observer subscription callback
   observer: Observer<T>, // Observer to pass to clients who want to subscribe to observe the stream of values of type T. Eg. Observer is passed to React components that will subscribe and re-render when the value is updated. Note that stream of values is memoryless and new client subscriptions can only read the current value and have future values pushed to them; historical values are lost (and gc'ing old values is an important property to avoid memory leaks in a long-running app)
   setValueAndNotifyObservers: (t: T) => void, // update the current value to the passed new value and push this new value to all subscriptions. The current (old) value is discarded
 }
 
-// makeObserverOwner constructs a canonical instance of
+// makeObservableValue constructs a canonical instance of
 // ObservableValue. See note on ObservableValue.
-export function makeObserverOwner<T>(initialValue: T): ObservableValue<T> {
+export function makeObservableValue<T>(initialValue: T): ObservableValue<T> {
   let currentValue = initialValue;
   const subs: Set<SubscriptionOnValueChangeHandler<T>> = new Set();
   const subscribe = (newSub: SubscriptionOnValueChangeHandler<T>) => {
@@ -89,11 +99,11 @@ export function makeObserverOwner<T>(initialValue: T): ObservableValue<T> {
 // unmount to avoid memory leaks and updating state on new value push
 // after a component is unmounted.
 export function useObservedValue<T>(o: Observer<T>): T {
-  const [t, setT] = useState(undefined as undefined | T);
+  const [t, setT] = useState(() => o.getCurrentValue());
   useEffect(() => {
     return o.subscribe(setT).unsubscribe;
-  }, [o]);
-  return t === undefined ? o.getCurrentValue() : t;
+  }, [o, setT]);
+  return t;
 }
 
 // mockObserver constructs a mock Observer for testing purposes.
