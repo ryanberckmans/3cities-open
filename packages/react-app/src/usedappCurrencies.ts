@@ -36,7 +36,15 @@ const ArbitrumRinkebyUSDC = new Token('USD Coin', 'USDC', ArbitrumRinkeby.chainI
 const ArbitrumUSDT = new Token('Tether USD', 'USDT', Arbitrum.chainId, '0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9');
 const ArbitrumRinkebyUSDT = new Token('Tether USD', 'USDT', ArbitrumRinkeby.chainId, ''); // TODO unsure of Tether addres on Arbitrum Rinkeby
 
-export const nativeCurrencies: [NativeCurrency, NativeCurrency, NativeCurrency] = isProduction ? [
+// TEST a shorter list of native currencies for testing purposes
+// export const nativeCurrencies: Readonly<[NativeCurrency]> = isProduction ? [
+//   Ether,
+// ] : [
+//   KovanEther,
+// ];
+
+// nativeCurrencies is our static global definition of all supported native currencies for all supported chains.
+export const nativeCurrencies: Readonly<[NativeCurrency, NativeCurrency, NativeCurrency]> = isProduction ? [
   Ether,
   OptimismEther,
   ArbitrumEther,
@@ -46,7 +54,15 @@ export const nativeCurrencies: [NativeCurrency, NativeCurrency, NativeCurrency] 
   ArbitrumRinkebyEther,
 ];
 
-export const tokens: [Token, Token, Token, Token, Token, Token, Token, Token, Token] = isProduction ? [
+// TEST a shorter list of tokens for testing purposes
+// export const tokens: Readonly<[Token]> = isProduction ? [
+//   Dai,
+// ] : [
+//   KovanDai,
+// ];
+
+// tokens is our static global definition of all supported erc20 tokens for all supported chains.
+export const tokens: Readonly<[Token, Token, Token, Token, Token, Token, Token, Token, Token]> = isProduction ? [
   Dai,
   OptimismDai,
   ArbitrumDai,
@@ -67,3 +83,41 @@ export const tokens: [Token, Token, Token, Token, Token, Token, Token, Token, To
   OptimismKovanUSDT,
   ArbitrumRinkebyUSDT,
 ];
+
+export type TokenKey = string // see getTokenKey
+
+// getTokenKey returns a string that uniquely identifies the passed
+// NativeCurrency or Token, suitable to be used as a hashing or object
+// key.
+export function getTokenKey(t: NativeCurrency | Token): TokenKey {
+  return `${t.ticker}-${t.chainId}`;
+}
+
+const tokensByTokenKey: Readonly<{ [tk: TokenKey]: NativeCurrency | Token }> = (() => {
+  const r: { [tk: TokenKey]: NativeCurrency | Token } = {};
+  for (const nc of nativeCurrencies) {
+    r[getTokenKey(nc)] = nc;
+  }
+  for (const t of tokens) {
+    r[getTokenKey(t)] = t;
+  }
+  return r;
+})();
+
+// getTokenByTokenKey returns a NativeCurrency or Token for the passed
+// TokenKey. For convenience, getTokenByTokenKey is a partial function
+// that throws an error if the passed TokenKey is not found in the
+// global cache. Alternatively, getTokenByTokenKey could have returned
+// `NativeCurrency | Token | undefined` which would be less
+// convenient.
+export function getTokenByTokenKey(tk: TokenKey): NativeCurrency | Token {
+  const t = tokensByTokenKey[tk];
+  if (t === undefined) throw new Error(`getTokenByTokenKey: unknown TokenKey: ${tk}`);
+  return t;
+}
+
+// isToken is a TypeScript type assertion helper function to match
+// `NativeCurrency | Token` into `Token` or `NativeCurrency`
+export function isToken(o: NativeCurrency | Token): o is Token {
+  return Object.prototype.hasOwnProperty.call(o, "address");
+}

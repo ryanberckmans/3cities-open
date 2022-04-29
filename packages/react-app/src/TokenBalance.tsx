@@ -3,6 +3,7 @@ import { formatEther } from "@ethersproject/units";
 import { NativeCurrency, Token, useEtherBalance, useTokenBalance } from "@usedapp/core";
 import React from "react";
 import { getChainName } from "./getChainName";
+import { isToken } from "./usedappCurrencies";
 
 type RenderProps = {
   balance: BigNumber | undefined;
@@ -32,10 +33,6 @@ const TokenBalance: React.FC<TokenBalanceProps> = ({ token, address }) => {
   console.log("useTokenBalance", token, address, b);
   return <Render balance={b} ticker={token.ticker} chainName={getChainName(token.chainId)
   } />;
-}
-
-function isToken(o: NativeCurrency | Token): o is Token {
-  return Object.prototype.hasOwnProperty.call(o, "address");
 }
 
 // TODO s/Wrapper/TokenBalance/ and rename the other TokenBalance to InternalTokenBalance or something
