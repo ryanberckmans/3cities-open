@@ -37,11 +37,11 @@ const ArbitrumUSDT = new Token('Tether USD', 'USDT', Arbitrum.chainId, '0xFd086b
 const ArbitrumRinkebyUSDT = new Token('Tether USD', 'USDT', ArbitrumRinkeby.chainId, '', 6); // TODO unsure of Tether address on Arbitrum Rinkeby
 
 // TEST a shorter list of native currencies for testing purposes
-export const nativeCurrencies2: Readonly<[NativeCurrency]> = isProduction ? [
-  Ether,
-] : [
-  KovanEther,
-];
+// export const nativeCurrencies2: Readonly<[NativeCurrency]> = isProduction ? [
+//   Ether,
+// ] : [
+//   KovanEther,
+// ];
 
 // nativeCurrencies is our static global definition of all supported native currencies for all supported chains.
 export const nativeCurrencies: Readonly<[NativeCurrency, NativeCurrency, NativeCurrency]> = isProduction ? [
@@ -55,10 +55,10 @@ export const nativeCurrencies: Readonly<[NativeCurrency, NativeCurrency, NativeC
 ];
 
 // TEST a shorter list of tokens for testing purposes
-export const tokens2: Readonly<[Token]> = isProduction ? [
-  Dai,
-] : [
-  KovanDai,
+// export const tokens2: Readonly<[Token]> = isProduction ? [
+//   Dai,
+// ] : [
+//   KovanDai,
 ];
 
 // tokens is our static global definition of all supported erc20 tokens for all supported chains.
