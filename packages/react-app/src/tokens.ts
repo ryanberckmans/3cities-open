@@ -148,3 +148,16 @@ export function getTokenByTokenKey(tk: TokenKey): NativeCurrency | Token {
 export function isToken(o: NativeCurrency | Token): o is Token {
   return Object.prototype.hasOwnProperty.call(o, "address");
 }
+
+// getDecimalsToRenderForTicker returns the canonical number of digits
+// after the decimal point to render for a token based on its passed
+// ticker.
+export function getDecimalsToRenderForTicker(ticker: string): number {
+  switch(ticker){
+    case 'ETH': return 4;
+    case 'DAI': return 2;
+    case 'USDC': return 2;
+    case 'USDT': return 2;
+  }
+  return 2;
+}
