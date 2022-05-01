@@ -1,49 +1,36 @@
-import { BigNumber } from "@ethersproject/bignumber";
-import { formatEther } from "@ethersproject/units";
-import { NativeCurrency, Token, useEtherBalance, useTokenBalance } from "@usedapp/core";
+import { NativeCurrency, Token } from "@usedapp/core";
 import React from "react";
 import { getChainName } from "./getChainName";
+import { useMemoEtherBalance } from "./hooks/useMemoEtherBalance";
+import { useMemoTokenBalance } from "./hooks/useMemoTokenBalance";
+import { RenderRawTokenBalance } from "./RenderRawTokenBalance";
 import { isToken } from "./usedappCurrencies";
 
-type RenderProps = {
-  balance: BigNumber | undefined;
-  ticker: string;
-  chainName: string;
-}
-const Render: React.FC<RenderProps> = ({ balance, ticker, chainName }) => {
-  return <span>{balance ? formatEther(balance) : '?'} {ticker} on {chainName}</span>;
+type RenderLiveTokenBalanceProps = {
+  address: string; // address whose token balance will be live-reloaded and rendered
+  nativeCurrencyOrToken: NativeCurrency | Token; // native currency or token whose address balance will be live-reloaded and rendered
+};
+export const RenderLiveTokenBalance: React.FC<RenderLiveTokenBalanceProps> = ({ address, nativeCurrencyOrToken }) => {
+  return isToken(nativeCurrencyOrToken) ?
+    <RenderLiveTokenBalanceInternal address={address} token={nativeCurrencyOrToken} /> :
+    <RenderLiveNativeCurrencyBalance address={address} nativeCurrency={nativeCurrencyOrToken} />;
 }
 
-type NativeCurrencyBalanceProps = {
+type RenderLiveNativeCurrencyBalanceProps = {
+  address: string;
   nativeCurrency: NativeCurrency;
-  address: string;
 };
-const NativeCurrencyBalance: React.FC<NativeCurrencyBalanceProps> = ({ nativeCurrency, address }) => {
-  const b = useEtherBalance(address, { chainId: nativeCurrency.chainId });
-  return <Render balance={b} ticker={nativeCurrency.ticker} chainName={getChainName(nativeCurrency.chainId)} />;
+const RenderLiveNativeCurrencyBalance: React.FC<RenderLiveNativeCurrencyBalanceProps> = ({ address, nativeCurrency }) => {
+  const b = useMemoEtherBalance(address, nativeCurrency.chainId);
+  return <RenderRawTokenBalance balance={b} ticker={nativeCurrency.ticker} chainName={getChainName(nativeCurrency.chainId)} />;
 }
 
-
-type TokenBalanceProps = {
-  token: Token;
+type RenderLiveTokenBalanceInternalProps = {
   address: string;
+  token: Token;
 };
-const TokenBalance: React.FC<TokenBalanceProps> = ({ token, address }) => {
-  const b = useTokenBalance(token.address, address, { chainId: token.chainId });
-  console.log("useTokenBalance", token, address, b);
-  return <Render balance={b} ticker={token.ticker} chainName={getChainName(token.chainId)
+const RenderLiveTokenBalanceInternal: React.FC<RenderLiveTokenBalanceInternalProps> = ({ address, token }) => {
+  const b = useMemoTokenBalance(token.address, address, token.chainId);
+  return <RenderRawTokenBalance balance={b} ticker={token.ticker} chainName={getChainName(token.chainId)
   } />;
 }
-
-// TODO s/Wrapper/TokenBalance/ and rename the other TokenBalance to InternalTokenBalance or something
-type WrapperProps = {
-  nativeCurrencyOrToken: NativeCurrency | Token; // native currency or token whose address balance will be fetched and rendered. TODO maybe aggregate NativeCurrency/Token into a wrapper type 3cities.Token
-  address: string; // address whose token balance will be loaded and rendered
-};
-const Wrapper: React.FC<WrapperProps> = ({ nativeCurrencyOrToken, address }) => {
-  return isToken(nativeCurrencyOrToken) ?
-    <TokenBalance token={nativeCurrencyOrToken} address={address} /> :
-    <NativeCurrencyBalance nativeCurrency={nativeCurrencyOrToken} address={address} />;
-}
-
-export default Wrapper;
