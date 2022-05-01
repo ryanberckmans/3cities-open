@@ -106,6 +106,20 @@ export function getTokenKey(t: NativeCurrency | Token): TokenKey {
   return `${t.ticker}-${t.chainId}`;
 }
 
+// allTokenKeys is a list of all TokenKeys for both nativeCurrencies
+// and tokens that also provides a canonical ordering of all TokenKeys
+// to help clients display tokens in a deterministic, stable order.
+export const allTokenKeys: Readonly<TokenKey[]> = (() => {
+  const tks: TokenKey[] = [];
+  for (const nc of nativeCurrencies) {
+    tks.push(getTokenKey(nc));
+  }
+  for (const t of tokens) {
+    tks.push(getTokenKey(t));
+  }
+  return tks;
+})();
+
 const tokensByTokenKey: Readonly<{ [tk: TokenKey]: NativeCurrency | Token }> = (() => {
   const r: { [tk: TokenKey]: NativeCurrency | Token } = {};
   for (const nc of nativeCurrencies) {
