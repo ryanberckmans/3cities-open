@@ -1,5 +1,6 @@
-import { Arbitrum, ArbitrumRinkeby, Dai, Ether, Kovan, KovanDai, KovanEther, Mainnet, NativeCurrency, Optimism, OptimismKovan, Token } from "@usedapp/core";
+import { Arbitrum, ArbitrumRinkeby, Dai, Ether, Kovan, KovanDai, KovanEther, Mainnet, NativeCurrency, Optimism, OptimismKovan, Token, ZkSyncTestnet } from "@usedapp/core";
 import { isProduction } from "./isProduction";
+import { NonEmptyArray } from "./NonEmptyArray";
 
 // WARNING currencies defined here won't actually work at runtime unless an rpc url is defined for their chainId in the loaded @useDapp/core.Config.
 
@@ -36,15 +37,22 @@ const ArbitrumRinkebyUSDC = new Token('USD Coin', 'USDC', ArbitrumRinkeby.chainI
 const ArbitrumUSDT = new Token('Tether USD', 'USDT', Arbitrum.chainId, '0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9', 6);
 const ArbitrumRinkebyUSDT = new Token('Tether USD', 'USDT', ArbitrumRinkeby.chainId, '', 6); // TODO unsure of Tether address on Arbitrum Rinkeby
 
+// ZkSync Goerli token list: https://zksync2-testnet.zkscan.io/tokens
+// ZkSync Goerli chainId: 280
+const ZkSyncGoerliEther = new NativeCurrency('Ether', 'ETH', ZkSyncTestnet.chainId);
+const ZkSyncGoerliDai = new Token('Dai', 'DAI', ZkSyncTestnet.chainId, '0xE8c7cE6Ee9Fc75196bC5317883bD73A0F4ac7Bc0');
+const ZkSyncGoerliUSDC = new Token('USD Coin', 'USDC', ZkSyncTestnet.chainId, '0x51A86f7c855e2Ccef4DeCE8b90409C2a639641E5', 6); // TODO multiple USDC tokens appear on ZkSync Goerli, which is correct?
+const ZkSyncGoerliUSDT = new Token('Tether USD', 'USDT', ZkSyncTestnet.chainId, '0x192D8955DBCB4a811ED73715894504e16A5F4466', 6); // TODO multiple USDT tokens appear on ZkSync Goerli, which is correct?
+
 // TEST a shorter list of native currencies for testing purposes
-// export const nativeCurrencies2: Readonly<[NativeCurrency]> = isProduction ? [
+// export const nativeCurrencies2: Readonly<NonEmptyArray<NativeCurrency>> = isProduction ? [
 //   Ether,
 // ] : [
 //   KovanEther,
 // ];
 
 // nativeCurrencies is our static global definition of all supported native currencies for all supported chains.
-export const nativeCurrencies: Readonly<[NativeCurrency, NativeCurrency, NativeCurrency]> = isProduction ? [
+export const nativeCurrencies: Readonly<NonEmptyArray<NativeCurrency>> = isProduction ? [
   Ether,
   OptimismEther,
   ArbitrumEther,
@@ -52,17 +60,19 @@ export const nativeCurrencies: Readonly<[NativeCurrency, NativeCurrency, NativeC
   KovanEther,
   OptimismKovanEther,
   ArbitrumRinkebyEther,
+  ZkSyncGoerliEther,
 ];
 
 // TEST a shorter list of tokens for testing purposes
-// export const tokens2: Readonly<[Token]> = isProduction ? [
+// export const tokens2: Readonly<NonEmptyArray<Token>> = isProduction ? [
 //   Dai,
 // ] : [
 //   KovanDai,
 // ];
 
 // tokens is our static global definition of all supported erc20 tokens for all supported chains.
-export const tokens: Readonly<[Token, Token, Token, Token, Token, Token, Token, Token, Token]> = isProduction ? [
+export const tokens: Readonly<NonEmptyArray<Token>> = isProduction ? [
+  // Here we group the tokens by ticker and not chain because `tokens` is used to generate the canonical token ordering in allTokenKeys and our supposition is that in a multichain UX, the user would rather see all their DAIs together than all their Optimism assets, although this is somewhat contrary to how the rest of the ecosystem works right now where most apps support connecting to only one chain at a time and so naturally render all assets for one chain, effectively sorting by chain before ticker
   Dai,
   OptimismDai,
   ArbitrumDai,
@@ -76,12 +86,15 @@ export const tokens: Readonly<[Token, Token, Token, Token, Token, Token, Token, 
   KovanDai,
   OptimismKovanDai,
   ArbitrumRinkebyDai,
+  ZkSyncGoerliDai,
   KovanUSDC,
   OptimismKovanUSDC,
   ArbitrumRinkebyUSDC,
+  ZkSyncGoerliUSDC,
   KovanUSDT,
   OptimismKovanUSDT,
   ArbitrumRinkebyUSDT,
+  ZkSyncGoerliUSDT,
 ];
 
 export type TokenKey = string // see getTokenKey
