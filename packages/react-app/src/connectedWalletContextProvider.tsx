@@ -1,9 +1,8 @@
 import { BigNumber } from '@ethersproject/bignumber';
-import { NativeCurrency, Token } from '@usedapp/core';
+import { NativeCurrency, Token, useEthers } from '@usedapp/core';
 import React, { useCallback, useContext, useEffect, useState } from 'react';
 import { useImmer } from 'use-immer';
 import { AddressContext, emptyAddressContext } from './addressContext';
-import useAddressOrENS from './hooks/useAddressOrENS';
 import { useMemoEtherBalance } from './hooks/useMemoEtherBalance';
 import { useMemoTokenBalance } from './hooks/useMemoTokenBalance';
 import { makeObservableValue, ObservableValue, Observer } from './observer';
@@ -111,7 +110,8 @@ type ConnectedWalletAddressContextUpdaterProps = {
   ov: ObservableValue<AddressContext | undefined>;
 }
 const ConnectedWalletAddressContextUpdater: React.FC<ConnectedWalletAddressContextUpdaterProps> = ({ ov }) => {
-  const connectedWalletAddress = useAddressOrENS();
+  const { account } = useEthers();
+  const connectedWalletAddress: string | undefined = typeof account === 'string' ? account : undefined;
   useEffect(() => {
     if (connectedWalletAddress === undefined) { // here we only need to setValueAndNotifyObservers if connectedWalletAddress is undefined because if it's defined, we'll construct the AddressContext and call setValueAndNotifyObservers(defined value) in ConnectedWalletAddressContextUpdaterInner, and if connectedWalletAddress has transitioned from defined to undefined, the ConnectedWalletAddressContextUpdaterInner component has been unmounted and it won't (and isn't designed to) call setValueAndNotifyObservers(undefined) to notify clients that the wallet has become disconnected, so we need to do it here
       // console.log("setValueAndNotifyObservers(AddressContext=undefined)");
