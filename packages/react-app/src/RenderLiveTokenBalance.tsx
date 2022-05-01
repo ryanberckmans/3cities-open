@@ -4,7 +4,7 @@ import { getChainName } from "./getChainName";
 import { useMemoEtherBalance } from "./hooks/useMemoEtherBalance";
 import { useMemoTokenBalance } from "./hooks/useMemoTokenBalance";
 import { RenderRawTokenBalance } from "./RenderRawTokenBalance";
-import { isToken } from "./usedappCurrencies";
+import { isToken } from "./tokens";
 
 type RenderLiveTokenBalanceProps = {
   address: string; // address whose token balance will be live-reloaded and rendered

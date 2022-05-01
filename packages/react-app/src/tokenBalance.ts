@@ -1,4 +1,4 @@
-import { TokenKey } from "./usedappCurrencies";
+import { TokenKey } from "./tokens";
 
 // TokenBalance is a snapshot of an address's token balance on a
 // specific chain. For example, a snapshot of Bob's DAI balance on

@@ -1,5 +1,5 @@
 import { TokenBalance } from "./tokenBalance";
-import { TokenKey } from "./usedappCurrencies";
+import { TokenKey } from "./tokens";
 
 export type AddressContext = Readonly<{
   address: string;

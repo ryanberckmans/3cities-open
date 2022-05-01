@@ -8,7 +8,7 @@ import { useMemoEtherBalance } from './hooks/useMemoEtherBalance';
 import { useMemoTokenBalance } from './hooks/useMemoTokenBalance';
 import { makeObservableValue, ObservableValue, Observer } from './observer';
 import { TokenBalance } from './tokenBalance';
-import { getTokenKey, nativeCurrencies, tokens } from './usedappCurrencies';
+import { getTokenKey, nativeCurrencies, tokens } from './tokens';
 
 const ConnectedWalletAddressContextObserverContext = React.createContext<Observer<AddressContext | undefined> | undefined>(undefined);
 

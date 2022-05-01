@@ -2,7 +2,7 @@ import React from "react";
 import { getChainName } from "./getChainName";
 import { RenderRawTokenBalance } from "./RenderRawTokenBalance";
 import { TokenBalance } from "./tokenBalance";
-import { getTokenByTokenKey } from "./usedappCurrencies";
+import { getTokenByTokenKey } from "./tokens";
 
 type RenderTokenBalanceProps = {
   tokenBalance: TokenBalance;

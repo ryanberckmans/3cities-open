@@ -59,7 +59,7 @@ export const nativeCurrencies: Readonly<[NativeCurrency, NativeCurrency, NativeC
 //   Dai,
 // ] : [
 //   KovanDai,
-];
+// ];
 
 // tokens is our static global definition of all supported erc20 tokens for all supported chains.
 export const tokens: Readonly<[Token, Token, Token, Token, Token, Token, Token, Token, Token]> = isProduction ? [
