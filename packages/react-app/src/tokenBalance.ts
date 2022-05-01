@@ -9,3 +9,10 @@ export type TokenBalance = Readonly<{
   balanceAsBigNumberHexString: string; // the actual token balance as a BigNumber.toHexString()
   balanceAsOf: number; // time at which this token balance was snapshotted in milliseconds since epoch
 }>
+
+// isZero returns true iff the passed TokenBalance has a zero balance.
+// isZero exists to wrap the definition of "zero" for
+// balanceAsBigNumberHexString.
+export function isZero(tb: TokenBalance): boolean {
+  return tb.balanceAsBigNumberHexString === "0x00";
+}
