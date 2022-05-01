@@ -3301,10 +3301,10 @@
   resolved "https://registry.yarnpkg.com/@uniswap/token-lists/-/token-lists-1.0.0-beta.28.tgz#76bb6ec25e76ae6bece9efc11b9b68079b2b9402"
   integrity sha512-MmVeoOd/HlZYOn5NT2mlDoOUYjnZb+3V7aCD5/YwSgsqeDRXZmKfKHafEEhiZoMvXuZdqSBg4L/ythvzAf9cwA==
 
-"@usedapp/core@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@usedapp/core/-/core-1.0.0.tgz#5f1f366d04a04fd542c9594635a74ba5f98db3ae"
-  integrity sha512-WbMgc6esjaNhN3XR0iaz52dWEXQOJEaLLlJm8kw6APy+h/4A6WtW+emiaFDRuItn6Ora6lCF9AEoOBbycpGM7g==
+"@usedapp/core@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@usedapp/core/-/core-1.0.1.tgz#6802a352c21fcbd0052ad9d6e6e3ccd06c99db93"
+  integrity sha512-FDK/HSa8UBEqp4B3DFlFLr84OxQi9VlPSwucbIGl4Fcquoazz9mKNxkBMljRQ4aAZj8McEQbV3mP+vO4ZXjW7g==
   dependencies:
     "@ethersproject/abi" "^5.6.1"
     "@ethersproject/abstract-provider" "^5.6.0"
