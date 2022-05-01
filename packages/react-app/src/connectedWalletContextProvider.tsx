@@ -6,7 +6,7 @@ import { AddressContext, emptyAddressContext } from './addressContext';
 import { useMemoEtherBalance } from './hooks/useMemoEtherBalance';
 import { useMemoTokenBalance } from './hooks/useMemoTokenBalance';
 import { makeObservableValue, ObservableValue, Observer } from './observer';
-import { TokenBalance } from './tokenBalance';
+import { isDust, TokenBalance } from './tokenBalance';
 import { getTokenKey, nativeCurrencies, tokens } from './tokens';
 
 const ConnectedWalletAddressContextObserverContext = React.createContext<Observer<AddressContext | undefined> | undefined>(undefined);
@@ -82,8 +82,14 @@ const ConnectedWalletAddressContextUpdaterInner: React.FC<ConnectedWalletAddress
           balanceAsBigNumberHexString: newBalance.toHexString(),
           balanceAsOf: new Date().getTime(),
         };
-        // console.log("updateNativeCurrencyOrTokenBalance callback, tb=", JSON.stringify(tb), 'cwa', connectedWalletAddress, 'draft.address', draft.address);
-        draft.tokenBalances[tk] = tb;
+        if (isDust(tb)) {
+          // this token's balance is zero or dust. We want AddressContet to reflect useful token balances and so we'll treat this token balance as if it doesn't exist
+          // console.log("ignoring token dust", JSON.stringify(tb));
+          delete draft.tokenBalances[tk]; // delete any stale token balance
+        } else {
+          // console.log("updateNativeCurrencyOrTokenBalance callback, tb=", JSON.stringify(tb), 'cwa', connectedWalletAddress, 'draft.address', draft.address);
+          draft.tokenBalances[tk] = tb;
+        }
       }
     });
   }, [connectedWalletAddress, setAC]);
