@@ -22,7 +22,12 @@ type RenderLiveNativeCurrencyBalanceProps = {
 };
 const RenderLiveNativeCurrencyBalance: React.FC<RenderLiveNativeCurrencyBalanceProps> = ({ address, nativeCurrency }) => {
   const b = useMemoEtherBalance(address, nativeCurrency.chainId);
-  return <RenderRawTokenBalance balance={b} ticker={nativeCurrency.ticker} chainName={getChainName(nativeCurrency.chainId)} />;
+  return <RenderRawTokenBalance
+    balance={b}
+    ticker={nativeCurrency.ticker}
+    decimals={nativeCurrency.decimals}
+    chainName={getChainName(nativeCurrency.chainId)}
+  />;
 }
 
 type RenderLiveTokenBalanceInternalProps = {
@@ -31,6 +36,10 @@ type RenderLiveTokenBalanceInternalProps = {
 };
 const RenderLiveTokenBalanceInternal: React.FC<RenderLiveTokenBalanceInternalProps> = ({ address, token }) => {
   const b = useMemoTokenBalance(token.address, address, token.chainId);
-  return <RenderRawTokenBalance balance={b} ticker={token.ticker} chainName={getChainName(token.chainId)
-  } />;
+  return <RenderRawTokenBalance
+    balance={b}
+    ticker={token.ticker}
+    decimals={token.decimals}
+    chainName={getChainName(token.chainId)}
+  />;
 }

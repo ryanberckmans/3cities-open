@@ -15,6 +15,7 @@ export const RenderTokenBalance: React.FC<RenderTokenBalanceProps> = ({ tokenBal
   return <RenderRawTokenBalance
     balance={tokenBalance.balanceAsBigNumberHexString}
     ticker={t.ticker}
+    decimals={t.decimals}
     chainName={getChainName(t.chainId)}
   />;
 }
