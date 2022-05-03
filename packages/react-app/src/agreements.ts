@@ -16,7 +16,7 @@ export type Donation = {
   senderAddress: string; // sender address making the donation
   receiverAddress: string; // receiver address receiving the donation
   logicalAssetTicker: LogicalAssetTicker; // logical asset ticker of the asset being donated
-  amountAsBigNumberHexString: string; // amount of the donation in units of the logical asset as a BigNumber.toHexString()
+  amountAsBigNumberHexString: string; // amount of the donation in units of the logical asset as a BigNumber.toHexString(). TODO support complex amount eg. "more than $5", "any amount", "exactly $69.420", etc.
   _isDonation: true; // internal field to help match an Agreement into a Donation
 };
 
