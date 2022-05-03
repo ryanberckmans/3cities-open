@@ -20,7 +20,8 @@ Here are some future serialization libraries to try
 // into a modified base64 representation that doesn't need to be URL
 // encoded to be used in an URL. The result will only be
 // deserializable if all types used in T are supported by
-// https://github.com/msgpack/msgpack-javascript
+// https://github.com/msgpack/msgpack-javascript (does not support
+// BigNumber)
 export function serializeToModifiedBase64<T>(t: T): string {
   return modifiedBase64Encode(gzipSync(encode(t)));
 }
