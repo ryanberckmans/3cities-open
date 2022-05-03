@@ -19,12 +19,17 @@
     "@apollo/client": "^3.5.10",
     "@ethersproject/contracts": "^5.6.0",
     "@ethersproject/providers": "^5.6.4",
+    "@msgpack/msgpack": "^2.7.2",
+    "@shelacek/ubjson": "^1.1.1",
     "@usedapp/core": "^1.0.1",
+    "assert": "^2.0.0",
+    "fflate": "^0.7.3",
     "graphql": "^16.3.0",
     "immer": "^9.0.12",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
-    "use-immer": "^0.7.0"
+    "use-immer": "^0.7.0",
+    "util": "^0.12.4"
   },
   "devDependencies": {
     "@testing-library/dom": "^8.13",
