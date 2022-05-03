@@ -3,7 +3,7 @@ import { gunzipSync, gzipSync } from 'fflate';
 import { modifiedBase64Decode, modifiedBase64Encode } from './base64';
 
 /*
-TODO in the future, we need to switch to the expensive task of writing and maintaining a schema-based serializer. A schema-based serializer offers two benefits: 1) schema change management, so that values serialized with older versions of a type can successfully be serialized into a newer version of the type, and 2) dramatically improved efficiency in terms of the final base64 value length
+TODO in the future, we need to switch to the expensive task of writing and maintaining a schema-based serializer. A schema-based serializer offers two benefits: 1) schema change management, so that values serialized with older versions of a type can successfully be serialized into a newer version of the type, and 2) improved efficiency in terms of the final base64 value length because the schema is leveraged to reduce the amount of data that needs to go over the wire
 
 Here are some future serialization libraries to try
     1. https://github.com/zandaqo/structurae#binary-protocol
