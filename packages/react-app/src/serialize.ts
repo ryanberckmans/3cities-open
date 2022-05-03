@@ -1,60 +1,35 @@
-import * as Ubjson from '@shelacek/ubjson';
-import { encode, decode } from "@msgpack/msgpack";
-import { gzipSync, gunzipSync } from 'fflate';
-import { deepStrictEqual } from "assert";
+import { decode, encode } from "@msgpack/msgpack";
+import { gunzipSync, gzipSync } from 'fflate';
 import { modifiedBase64Decode, modifiedBase64Encode } from './base64';
 
-// TODO use schema-based serialization. currently, serializing a basic test Checkout results in a final base64 value length of 288 characters. I suspect that a schema-based serialization, eg. using protocol buffers, would have a substantially smaller final base64 length. 
+/*
+TODO in the future, we need to switch to the expensive task of writing and maintaining a schema-based serializer. A schema-based serializer offers two benefits: 1) schema change management, so that values serialized with older versions of a type can successfully be serialized into a newer version of the type, and 2) dramatically improved efficiency in terms of the final base64 value length
 
-// TODO WARNING add a comment that anything serialized must use only supported types, eg. number/string/Date/etc. and not BigNumber? or is BigNumber serializable?
+Here are some future serialization libraries to try
+    1. https://github.com/zandaqo/structurae#binary-protocol
+    2. flatbuffers https://google.github.io/flatbuffers/flatbuffers_guide_tutorial.html
+    3. protocol buffers
+        https://github.com/protobufjs/protobuf.js/
+        https://github.com/mafintosh/protocol-buffers
+    4. also see this paper (I already went through this, but including it here for reference) https://www.researchgate.net/publication/357647399_A_Survey_of_JSON-compatible_Binary_Serialization_Specifications
+    what do I think?
+        at first glance, Structurae may be more promising than flatbuffers or protocol buffers because Structurae was designed specifically for typescript. But, I haven't yet studied how schema change management works with Structurae
+*/
 
-import { Checkout } from "./checkout";
-
-const t: Checkout = {
-  proposedAgreement: {
-    receiverAddress: '0xac0d7753EA2816501b57fae9ad665739018384b3',
-    logicalAssetTicker: 'USD',
-    amountAsBigNumberHexString: '0xTODO',
-    _isDonation: true,
-  },
-  strategyPreferences: {
-    tokenTickerExclusions: ['USDT'],
-    chainIdExclusions: [1],
-  },
-};
-
-function serializeUbjson<T>(t: T): ArrayBuffer {
-  return Ubjson.encode(t);
+// serializeToModifiedBase64 serializes the passed value of type T
+// into a modified base64 representation that doesn't need to be URL
+// encoded to be used in an URL. The result will only be
+// deserializable if all types used in T are supported by
+// https://github.com/msgpack/msgpack-javascript
+export function serializeToModifiedBase64<T>(t: T): string {
+  return modifiedBase64Encode(gzipSync(encode(t)));
 }
 
-function serializeMsgpack<T>(t: T): Uint8Array {
-  return encode(t);
+// deserializeFromModifiedBase64 deserializes the passed string into a
+// value of type T. Precondition: the passed string was serialized
+// using serializeToModifiedBase64 from a value of type T, the type T
+// has not changed since serialization, and any types in T are
+// supported by serializeToModifiedBase64.
+export function deserializeFromModifiedBase64<T>(s: string): T {
+  return decode(gunzipSync((new Uint8Array(modifiedBase64Decode(s))))) as T;
 }
-
-console.log('serializeUbjson length', serializeUbjson(t).byteLength);
-console.log('serializeMsgpack length', serializeMsgpack(t).byteLength);
-
-console.log('serializeUbjson Uint8Array length', new Uint8Array(serializeUbjson(t)).byteLength);
-
-
-console.log('serializeUbjson gzip length', gzipSync(new Uint8Array(serializeUbjson(t))).byteLength);
-console.log('serializeMsgpack gzip length', gzipSync(serializeMsgpack(t)).byteLength);
-
-console.log('serializeUbjson gzip base64 length', modifiedBase64Encode(gzipSync(new Uint8Array(serializeUbjson(t)))).length);
-console.log('serializeMsgpack gzip base64 length', modifiedBase64Encode(gzipSync(serializeMsgpack(t))).length);
-
-console.log("naive json length", JSON.stringify(t).length);
-console.log("naive json base64 length", window.btoa(JSON.stringify(t)).length);
-
-const s1 = modifiedBase64Encode(gzipSync(new Uint8Array(serializeUbjson(t))))
-const s2 = modifiedBase64Encode(gzipSync(serializeMsgpack(t)));
-console.log("ubjson final base64", s1);
-console.log("msgpack final base64", s2);
-const t1: Checkout = Ubjson.decode(gunzipSync((new Uint8Array(modifiedBase64Decode(s1)))));
-console.log("t1", t1);
-deepStrictEqual(t, t1);
-const t2: Checkout = decode(gunzipSync((new Uint8Array(modifiedBase64Decode(s2))))) as Checkout;
-console.log("t2", t2);
-deepStrictEqual(t, t2);
-
-export const loadThisModule = true;
