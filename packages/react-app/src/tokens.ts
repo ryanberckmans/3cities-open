@@ -131,6 +131,21 @@ const tokensByTokenKey: Readonly<{ [tk: TokenKey]: NativeCurrency | Token }> = (
   return r;
 })();
 
+export const tokensByTicker: Readonly<{ [ticker: string]: NonEmptyArray<NativeCurrency | Token>}> = (() => {
+  const r: { [ticker: string]: NonEmptyArray<NativeCurrency | Token> } = {};
+  for (const nc of nativeCurrencies) {
+    const e = r[nc.ticker];
+    if (e === undefined) r[nc.ticker] = [nc];
+    else e.push(nc);
+  }
+  for (const t of tokens) {
+    const e = r[t.ticker];
+    if (e === undefined) r[t.ticker] = [t];
+    else e.push(t);
+  }
+  return r;
+})();
+
 // getTokenByTokenKey returns a NativeCurrency or Token for the passed
 // TokenKey. For convenience, getTokenByTokenKey is a partial function
 // that throws an error if the passed TokenKey is not found in the
