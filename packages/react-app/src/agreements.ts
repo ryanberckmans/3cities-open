@@ -4,25 +4,36 @@ import { LogicalAssetTicker } from "./logicalAssets";
 // participants.
 export type Agreement = Donation | UnusedAgreement;
 
+export function isDonation(a: Agreement): a is Donation {
+  return Object.prototype.hasOwnProperty.call(a, "_d");
+}
+
 // ProposedAgreement is a proposal between at least one concrete
 // participant and at least one unspecified participant, ie. a
 // ProposedAgreement is an Agreement that's incomplete because it
-// hasn't yet been accepted/completed.
+// hasn't yet been accepted by the counterparty(ies).
 export type ProposedAgreement = ReceiverProposedDonation | ProposedUnusedAgreement;
+
+export function isReceiverProposedDonation(pa: ProposedAgreement): pa is ReceiverProposedDonation {
+  return Object.prototype.hasOwnProperty.call(pa, "_rpd");
+}
 
 // Donation is an agreement for a sender to donate to a
 // receiver an amount of a logical asset.
 export type Donation = {
-  senderAddress: string; // sender address making the donation
-  receiverAddress: string; // receiver address receiving the donation
+  toAddress: string; // address receiving the donation
+  fromAddress: string; // address sending the donation
   logicalAssetTicker: LogicalAssetTicker; // logical asset ticker of the asset being donated
   amountAsBigNumberHexString: string; // amount of the donation in units of the logical asset as a BigNumber.toHexString(). TODO support complex amount eg. "more than $5", "any amount", "exactly $69.420", etc.
-  _isDonation: true; // internal field to help match an Agreement into a Donation
+  _d: true; // internal field to help match an Agreement into a Donation
 };
+
 
 // ReceiverProposedDonation is a Donation that's been proposed by the
 // receiver, ie. it lacks a sender.
-export type ReceiverProposedDonation = Omit<Donation, 'senderAddress'>;
+export type ReceiverProposedDonation = Omit<Donation, 'fromAddress' | '_d'> & {
+  _rpd: true; // internal field to help match an ProposedAgreement into a ReceiverProposedDonation
+};
 
 // UnusedAgreement is an agremeent that's not yet used and is a
 // placeholder to exemplify the fact that Agreement is intended to be
