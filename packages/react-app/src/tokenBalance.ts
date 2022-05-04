@@ -1,5 +1,5 @@
 import { formatUnits } from "@ethersproject/units";
-import { getDecimalsToRenderForTicker, getTokenByTokenKey, TokenKey } from "./tokens";
+import { getDecimalsToRenderForTokenTicker, getTokenByTokenKey, TokenKey } from "./tokens";
 
 // TokenBalance is a snapshot of an address's token balance on a
 // specific chain. For example, a snapshot of Bob's DAI balance on
@@ -28,7 +28,7 @@ export function isDust(tb: TokenBalance): boolean {
     const t = getTokenByTokenKey(tb.tokenKey);
     const bs = formatUnits(tb.balanceAsBigNumberHexString, t.decimals);
     const bf = Number.parseFloat(bs);
-    const br = bf.toFixed(getDecimalsToRenderForTicker(t.ticker));
+    const br = bf.toFixed(getDecimalsToRenderForTokenTicker(t.ticker));
     const bf2 = Number.parseFloat(br);
     return bf2 === 0;
   }
