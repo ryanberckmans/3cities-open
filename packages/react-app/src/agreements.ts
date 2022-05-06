@@ -25,14 +25,32 @@ export type Payment = {
   fromAddress: string; // address sending the payment
   logicalAssetTicker: LogicalAssetTicker; // logical asset ticker of the asset being paid
   amountAsBigNumberHexString: string; // logical asset amount of the payment as a BigNumber.toHexString(). Note that this amount must be constructed using parseLogicalAssetAmount to properly respect logical asset decimal count. TODO support complex amount eg. "more than $5", "any amount", "exactly $69.420", etc.
-  _p: true; // internal field to help match an Agreement into a Payment
+  _p: true; // internal field to help match Payment types
+  _rpp: false; // internal field to help match Payment types
 };
 
 // ReceiverProposedPayment is a partial Payment that's been proposed by the
 // receiver, ie. it lacks a sender.
-export type ReceiverProposedPayment = Omit<Payment, 'fromAddress' | '_p'> & {
-  _rpp: true; // internal field to help match an ProposedAgreement into a ReceiverProposedPayment
+export type ReceiverProposedPayment = Omit<Payment, 'fromAddress' | '_p' | '_rpp'> & {
+  _p: false; // internal field to help match ReceiverProposedPayment types
+  _rpp: true; // internal field to help match ReceiverProposedPayment types
 };
+
+// acceptReceiverProposedPayment represents the counterparty
+// identified by the passed fromAddress as accepting the passed
+// payment proposed by the payment receiver. The result is a
+// fully-formed Payment with (only) concrete counterparties.
+export function acceptReceiverProposedPayment(fromAddress: string, rpp: ReceiverProposedPayment): Payment {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { _rpp, _p, ...temp } = rpp;
+  const p = {
+    fromAddress,
+    _p: true as const,
+    _rpp: false as const,
+    ...temp,
+  };
+  return p;
+}
 
 // UnusedAgreement is an agremeent that's not yet used and is a
 // placeholder to exemplify the fact that Agreement is intended to be
