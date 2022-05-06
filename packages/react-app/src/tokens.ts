@@ -1,12 +1,18 @@
-import { Arbitrum, ArbitrumRinkeby, Dai, Ether, Kovan, KovanDai, KovanEther, Mainnet, NativeCurrency, Optimism, OptimismKovan, Token, ZkSyncTestnet } from "@usedapp/core";
+import { Arbitrum, ArbitrumRinkeby, Dai, Ether, Kovan, KovanDai, Mainnet, NativeCurrency, Optimism, OptimismKovan, Token, ZkSyncTestnet } from "@usedapp/core";
 import { isProduction } from "./isProduction";
 import { NonEmptyArray } from "./NonEmptyArray";
 
 // WARNING currencies defined here won't actually work at runtime unless an rpc url is defined for their chainId in the loaded @useDapp/core.Config.
 
+// In our token registry, every production network has a single
+// testnet. Here, we have adopted Kovan as the single testnet for
+// mainnet.
 // Mainnet chainId: 1
 // Kovan chainId: 42
 // https://chainlist.org/
+const KovanEther = new NativeCurrency('Ether', 'ETH', Kovan.chainId);
+const WETH = new Token('Wrapped Ether', 'WETH', Mainnet.chainId, '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2', 18);
+const KovanWETH = new Token('Wrapped Ether', 'WETH', Kovan.chainId, '0xd0A1E359811322d97991E03f863a0C30C2cF029C', 18);
 const USDC = new Token('USD Coin', 'USDC', Mainnet.chainId, '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48', 6);
 const KovanUSDC = new Token('USD Coin', 'USDC', Kovan.chainId, '0x50dC5200082d37d5dd34B4b0691f36e3632fE1A8', 6);
 const USDT = new Token('Tether USD', 'USDT', Mainnet.chainId, '0xdac17f958d2ee523a2206206994597c13d831ec7', 6);
@@ -17,6 +23,8 @@ const KovanUSDT = new Token('Tether USD', 'USDT', Kovan.chainId, '0xe0BB0D3DE8c1
 // Optimism Kovan chainId: 69
 const OptimismEther = new NativeCurrency('Ether', 'ETH', Optimism.chainId);
 const OptimismKovanEther = new NativeCurrency('Ether', 'ETH', OptimismKovan.chainId);
+const OptimismWETH = new Token('Wrapped Ether', 'WETH', Optimism.chainId, '0x4200000000000000000000000000000000000006', 18);
+const OptimismKovanWETH = new Token('Wrapped Ether', 'WETH', OptimismKovan.chainId, '0x4200000000000000000000000000000000000006', 18);
 const OptimismDai = new Token('Dai', 'DAI', Optimism.chainId, '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1');
 const OptimismKovanDai = new Token('Dai', 'DAI', OptimismKovan.chainId, '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1');
 const OptimismUSDC = new Token('USD Coin', 'USDC', Optimism.chainId, '0x7F5c764cBc14f9669B88837ca1490cCa17c31607', 6); // TODO OptimismUSDC matches the contract address in the explorer, https://optimistic.etherscan.io/token/0x7f5c764cbc14f9669b88837ca1490cca17c31607 but it seems to fail to load based on a quick test with our TokenBalance component returning '?'
@@ -30,16 +38,19 @@ const OptimismKovanUSDT = new Token('Tether USD', 'USDT', OptimismKovan.chainId,
 // Arbitrum Rinkeby chainId: 421611
 const ArbitrumEther = new NativeCurrency('Ether', 'ETH', Arbitrum.chainId);
 const ArbitrumRinkebyEther = new NativeCurrency('Ether', 'ETH', ArbitrumRinkeby.chainId);
+const ArbitrumWETH = new Token('Wrapped Ether', 'WETH', Arbitrum.chainId, '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1', 18);
+const ArbitrumRinkebyWETH = new Token('Wrapped Ether', 'WETH', ArbitrumRinkeby.chainId, '0xB47e6A5f8b33b3F17603C83a0535A9dcD7E32681', 18);
 const ArbitrumDai = new Token('Dai', 'DAI', Arbitrum.chainId, '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1');
 const ArbitrumRinkebyDai = new Token('Dai', 'DAI', ArbitrumRinkeby.chainId, '0x2f3c1b6a51a469051a22986aa0ddf98466cc8d3c');
 const ArbitrumUSDC = new Token('USD Coin', 'USDC', Arbitrum.chainId, '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8', 6);
 const ArbitrumRinkebyUSDC = new Token('USD Coin', 'USDC', ArbitrumRinkeby.chainId, '0x1E77ad77925Ac0075CF61Fb76bA35D884985019d', 6);
 const ArbitrumUSDT = new Token('Tether USD', 'USDT', Arbitrum.chainId, '0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9', 6);
-const ArbitrumRinkebyUSDT = new Token('Tether USD', 'USDT', ArbitrumRinkeby.chainId, '', 6); // TODO unsure of Tether address on Arbitrum Rinkeby
+// const ArbitrumRinkebyUSDT = new Token('Tether USD', 'USDT', ArbitrumRinkeby.chainId, '', 6); // TODO unsure of Tether address on Arbitrum Rinkeby
 
 // ZkSync Goerli token list: https://zksync2-testnet.zkscan.io/tokens
 // ZkSync Goerli chainId: 280
 const ZkSyncGoerliEther = new NativeCurrency('Ether', 'ETH', ZkSyncTestnet.chainId);
+// TODO ZkSyncGoerliWETH, unsure of WETH address on ZkSyncGoerli
 const ZkSyncGoerliDai = new Token('Dai', 'DAI', ZkSyncTestnet.chainId, '0xE8c7cE6Ee9Fc75196bC5317883bD73A0F4ac7Bc0');
 const ZkSyncGoerliUSDC = new Token('USD Coin', 'USDC', ZkSyncTestnet.chainId, '0x51A86f7c855e2Ccef4DeCE8b90409C2a639641E5', 6); // TODO multiple USDC tokens appear on ZkSync Goerli, which is correct?
 const ZkSyncGoerliUSDT = new Token('Tether USD', 'USDT', ZkSyncTestnet.chainId, '0x192D8955DBCB4a811ED73715894504e16A5F4466', 6); // TODO multiple USDT tokens appear on ZkSync Goerli, which is correct?
@@ -73,6 +84,9 @@ export const nativeCurrencies: Readonly<NonEmptyArray<NativeCurrency>> = isProdu
 // tokens is our static global definition of all supported erc20 tokens for all supported chains.
 export const tokens: Readonly<NonEmptyArray<Token>> = isProduction ? [
   // Here we group the tokens by ticker and not chain because `tokens` is used to generate the canonical token ordering in allTokenKeys and our supposition is that in a multichain UX, the user would rather see all their DAIs together than all their Optimism assets, although this is somewhat contrary to how the rest of the ecosystem works right now where most apps support connecting to only one chain at a time and so naturally render all assets for one chain, effectively sorting by chain before ticker
+  WETH,
+  OptimismWETH,
+  ArbitrumWETH,
   Dai,
   OptimismDai,
   ArbitrumDai,
@@ -83,6 +97,9 @@ export const tokens: Readonly<NonEmptyArray<Token>> = isProduction ? [
   OptimismUSDT,
   ArbitrumUSDT,
 ] : [
+  KovanWETH,
+  OptimismKovanWETH,
+  ArbitrumRinkebyWETH,
   KovanDai,
   OptimismKovanDai,
   ArbitrumRinkebyDai,
@@ -93,7 +110,6 @@ export const tokens: Readonly<NonEmptyArray<Token>> = isProduction ? [
   ZkSyncGoerliUSDC,
   KovanUSDT,
   OptimismKovanUSDT,
-  ArbitrumRinkebyUSDT,
   ZkSyncGoerliUSDT,
 ];
 
@@ -131,7 +147,7 @@ const tokensByTokenKey: Readonly<{ [tk: TokenKey]: NativeCurrency | Token }> = (
   return r;
 })();
 
-export const tokensByTicker: Readonly<{ [ticker: string]: NonEmptyArray<NativeCurrency | Token>}> = (() => {
+export const tokensByTicker: Readonly<{ [ticker: string]: NonEmptyArray<NativeCurrency | Token> }> = (() => {
   const r: { [ticker: string]: NonEmptyArray<NativeCurrency | Token> } = {};
   for (const nc of nativeCurrencies) {
     const e = r[nc.ticker];
@@ -168,7 +184,7 @@ export function isToken(o: NativeCurrency | Token): o is Token {
 // digits after the decimal point to render for a token based on its
 // passed ticker.
 export function getDecimalsToRenderForTokenTicker(ticker: string): number {
-  switch(ticker){
+  switch (ticker) {
     case 'ETH': return 4;
     case 'DAI': return 2;
     case 'USDC': return 2;
