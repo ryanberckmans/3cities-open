@@ -1,8 +1,10 @@
 import { BigNumber } from "@ethersproject/bignumber";
 import { NativeCurrency, Token } from "@usedapp/core";
-import { Agreement, isReceiverProposedPayment, ProposedAgreement } from "./agreements";
+import { AddressContext, canAfford } from "./addressContext";
+import { Agreement, isPayment, isReceiverProposedPayment, ProposedAgreement } from "./agreements";
 import { convertLogicalAssetUnits } from "./logicalAssets";
 import { getNativeCurrenciesAndTokensForLogicalAssetTicker } from "./logicalAssetsToTokens";
+import { getTokenKey } from "./tokens";
 import { TokenTransfer } from "./tokenTransfer";
 
 // StrategyPreferences are preferences expressed by one or more
@@ -66,11 +68,37 @@ export function getProposedStrategiesForProposedAgreement(prefs: StrategyPrefere
           amountAsBigNumberHexString: convertLogicalAssetUnits(BigNumber.from(pa.amountAsBigNumberHexString), token.decimals).toHexString(),
         },
       };
-    }))
+    }));
   }
   // TODO support generation of strategies based on exchange rates, eg. if payment is for $5 USD then we should support a strategy of paying $5 in ETH and vice versa
-  console.log("getProposedStrategiesForProposedAgreement prefs=", prefs, "pa=", pa, "r=", pss);
+  // console.log("getProposedStrategiesForProposedAgreement prefs=", prefs, "pa=", pa, "r=", pss);
   return pss;
 }
 
-// TODO def getStrategiesForAgreement(prefs: StrategyPreferences, a: Agreement, ac: AddressContext): Strategy[] --> // similar to getProposedStrategiesForProposedAgreement but also filters by tokens available in AddressContext and binds the strategies to ac.address
+// getStrategiesForAgreement computes the strategies for the passed
+// agreement, taking into account the passed strategy preferences and
+// address context.
+export function getStrategiesForAgreement(prefs: StrategyPreferences, a: Agreement, ac: AddressContext): Strategy[] {
+  const ss: Strategy[] = [];
+  if (isPayment(a)) {
+    const ts = getNativeCurrenciesAndTokensForLogicalAssetTicker(a.logicalAssetTicker);
+    ss.push(...ts
+      .filter(isTokenPermittedByStrategyPreferences.bind(null, prefs))
+      .map(token => {
+        return {
+          agreement: a,
+          tokenTransfer: {
+            toAddress: a.toAddress,
+            fromAddress: a.fromAddress,
+            token,
+            amountAsBigNumberHexString: convertLogicalAssetUnits(BigNumber.from(a.amountAsBigNumberHexString), token.decimals).toHexString(),
+          },
+        };
+      })
+      .filter(s => canAfford(ac, getTokenKey(s.tokenTransfer.token), s.tokenTransfer.amountAsBigNumberHexString)) // having already generated the set of possible strategies (which were already filtered to obey strategy preferences), we now further filter the strategies to accept only those affordable by the passed address context. Ie. here is where we ensure that the computed strategies are affordable by the payor
+    );
+  }
+  // TODO support generation of strategies based on exchange rates, eg. if payment is for $5 USD then we should support a strategy of paying $5 in ETH and vice versa
+  // console.log("getStrategiesForAgreement prefs=", prefs, "a=", a, "r=", ss);
+  return ss;
+}
