@@ -9,6 +9,6 @@ export function getNativeCurrenciesAndTokensForLogicalAssetTicker(lat: LogicalAs
     const maybeTokens = tokensByTicker[t];
     if (maybeTokens !== undefined) r.push(...maybeTokens);
   }
-  console.log("getNativeCurrenciesAndTokensForLogicalAssetTicker lat=", lat, "r=", r);
+  // console.log("getNativeCurrenciesAndTokensForLogicalAssetTicker lat=", lat, "r=", r);
   return r;
 }
