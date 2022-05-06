@@ -1,6 +1,6 @@
 import { BigNumber } from "@ethersproject/bignumber";
 import { NativeCurrency, Token } from "@usedapp/core";
-import { Agreement, isReceiverProposedDonation, ProposedAgreement } from "./agreements";
+import { Agreement, isReceiverProposedPayment, ProposedAgreement } from "./agreements";
 import { convertLogicalAssetUnits } from "./logicalAssets";
 import { getNativeCurrenciesAndTokensForLogicalAssetTicker } from "./logicalAssetsToTokens";
 import { TokenTransfer } from "./tokenTransfer";
@@ -55,7 +55,7 @@ export type ProposedStrategy = {
 // the passed strategy preferences.
 export function getProposedStrategiesForProposedAgreement(prefs: StrategyPreferences, pa: ProposedAgreement): ProposedStrategy[] {
   const pss: ProposedStrategy[] = [];
-  if (isReceiverProposedDonation(pa)) {
+  if (isReceiverProposedPayment(pa)) {
     const ts = getNativeCurrenciesAndTokensForLogicalAssetTicker(pa.logicalAssetTicker);
     pss.push(...ts.filter(isTokenPermittedByStrategyPreferences.bind(null, prefs)).map(token => {
       return {
@@ -68,7 +68,7 @@ export function getProposedStrategiesForProposedAgreement(prefs: StrategyPrefere
       };
     }))
   }
-  // TODO support generation of strategies based on exchange rates, eg. if donation is for $5 USD then we should support a strategy of paying $5 in ETH and vice versa
+  // TODO support generation of strategies based on exchange rates, eg. if payment is for $5 USD then we should support a strategy of paying $5 in ETH and vice versa
   console.log("getProposedStrategiesForProposedAgreement prefs=", prefs, "pa=", pa, "r=", pss);
   return pss;
 }

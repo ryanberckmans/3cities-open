@@ -2,37 +2,36 @@ import { LogicalAssetTicker } from "./logicalAssets";
 
 // Agreement is an economic agreement between multiple concrete
 // participants.
-export type Agreement = Donation | UnusedAgreement;
+export type Agreement = Payment | UnusedAgreement;
 
-export function isDonation(a: Agreement): a is Donation {
-  return Object.prototype.hasOwnProperty.call(a, "_d");
+export function isPayment(a: Agreement): a is Payment {
+  return Object.prototype.hasOwnProperty.call(a, "_p");
 }
 
 // ProposedAgreement is a proposal between at least one concrete
 // participant and at least one unspecified participant, ie. a
 // ProposedAgreement is an Agreement that's incomplete because it
 // hasn't yet been accepted by the counterparty(ies).
-export type ProposedAgreement = ReceiverProposedDonation | ProposedUnusedAgreement;
+export type ProposedAgreement = ReceiverProposedPayment | ProposedUnusedAgreement;
 
-export function isReceiverProposedDonation(pa: ProposedAgreement): pa is ReceiverProposedDonation {
-  return Object.prototype.hasOwnProperty.call(pa, "_rpd");
+export function isReceiverProposedPayment(pa: ProposedAgreement): pa is ReceiverProposedPayment {
+  return Object.prototype.hasOwnProperty.call(pa, "_rpp");
 }
 
-// Donation is an agreement for a sender to donate to a
-// receiver an amount of a logical asset.
-export type Donation = {
-  toAddress: string; // address receiving the donation
-  fromAddress: string; // address sending the donation
-  logicalAssetTicker: LogicalAssetTicker; // logical asset ticker of the asset being donated
-  amountAsBigNumberHexString: string; // amount of the donation in units of the logical asset as a BigNumber.toHexString(). TODO support complex amount eg. "more than $5", "any amount", "exactly $69.420", etc.
-  _d: true; // internal field to help match an Agreement into a Donation
+// Payment is an agreement for a sender to pay a receiver an amount of
+// a logical asset.
+export type Payment = {
+  toAddress: string; // address receiving the payment
+  fromAddress: string; // address sending the payment
+  logicalAssetTicker: LogicalAssetTicker; // logical asset ticker of the asset being paid
+  amountAsBigNumberHexString: string; // logical asset amount of the payment as a BigNumber.toHexString(). Note that this amount must be constructed using parseLogicalAssetAmount to properly respect logical asset decimal count. TODO support complex amount eg. "more than $5", "any amount", "exactly $69.420", etc.
+  _p: true; // internal field to help match an Agreement into a Payment
 };
 
-
-// ReceiverProposedDonation is a Donation that's been proposed by the
+// ReceiverProposedPayment is a partial Payment that's been proposed by the
 // receiver, ie. it lacks a sender.
-export type ReceiverProposedDonation = Omit<Donation, 'fromAddress' | '_d'> & {
-  _rpd: true; // internal field to help match an ProposedAgreement into a ReceiverProposedDonation
+export type ReceiverProposedPayment = Omit<Payment, 'fromAddress' | '_p'> & {
+  _rpp: true; // internal field to help match an ProposedAgreement into a ReceiverProposedPayment
 };
 
 // UnusedAgreement is an agremeent that's not yet used and is a
