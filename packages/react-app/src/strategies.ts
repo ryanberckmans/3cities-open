@@ -1,5 +1,7 @@
+import { BigNumber } from "@ethersproject/bignumber";
 import { NativeCurrency, Token } from "@usedapp/core";
 import { Agreement, isReceiverProposedDonation, ProposedAgreement } from "./agreements";
+import { convertLogicalAssetUnits } from "./logicalAssets";
 import { getNativeCurrenciesAndTokensForLogicalAssetTicker } from "./logicalAssetsToTokens";
 import { TokenTransfer } from "./tokenTransfer";
 
@@ -61,7 +63,7 @@ export function getProposedStrategiesForProposedAgreement(prefs: StrategyPrefere
         receiverProposedTokenTransfer: {
           toAddress: pa.toAddress,
           token,
-          amountAsBigNumberHexString: pa.amountAsBigNumberHexString, // TODO BUG here we must convert between the logical asset amount and the token asset amount, eg 1.0 logical ETH = 10^18 wei. TODO convert using token.decimals --> add a helper function in logicalAssetsToTokens
+          amountAsBigNumberHexString: convertLogicalAssetUnits(BigNumber.from(pa.amountAsBigNumberHexString), token.decimals).toHexString(),
         },
       };
     }))
