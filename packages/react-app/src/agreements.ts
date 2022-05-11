@@ -21,10 +21,11 @@ export function isReceiverProposedPayment(pa: ProposedAgreement): pa is Receiver
 // Payment is an agreement for a sender to pay a receiver an amount of
 // a logical asset.
 export type Payment = {
-  toAddress: string; // address receiving the payment
-  fromAddress: string; // address sending the payment
+  toAddress: string; // address receiving the payment TODO support ENS
+  fromAddress: string; // address sending the payment TODO support ENS
   logicalAssetTicker: LogicalAssetTicker; // logical asset ticker of the asset being paid
   amountAsBigNumberHexString: string; // logical asset amount of the payment as a BigNumber.toHexString(). Note that this amount must be constructed using parseLogicalAssetAmount to properly respect logical asset decimal count. TODO support complex amount eg. "more than $5", "any amount", "exactly $69.420", etc.
+  note?: string; // a human-readable note associated with this payment, eg. "for dinner"
   _p: true; // internal field to help match Payment types
   _rpp: false; // internal field to help match Payment types
 };
