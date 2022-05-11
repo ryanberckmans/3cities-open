@@ -1,14 +1,9 @@
 import { shortenAddress, useEthers, useLookupAddress } from "@usedapp/core";
 import React, { useEffect, useState } from "react";
-import { acceptReceiverProposedPayment, isReceiverProposedPayment } from "./agreements";
 import { Checkout } from "./checkout";
+import { CheckoutEditor } from "./CheckoutEditor";
 import { Body, Container, Header } from "./components";
-import { useConnectedWalletAddressContext } from './connectedWalletContextProvider';
-import { parseLogicalAssetAmount } from "./logicalAssets";
-import { RenderProposedStrategy, RenderStrategy } from "./RenderStrategy";
-import { RenderTokenBalance } from "./RenderTokenBalance";
-import { getProposedStrategiesForProposedAgreement, getStrategiesForAgreement } from "./strategies";
-import { allTokenKeys, getTokenKey } from "./tokens";
+import { serializeToModifiedBase64 } from "./serialize";
 // import { useConnectedWalletAddressContext } from "./connectedWalletContextProvider";
 
 // Old imports:
@@ -49,7 +44,7 @@ function WalletButton() {
   }, [error]);
 
   return (
-    <button className="text-3xl font-bold underline border-4 border-dotted border-black"
+    <button className="text-1xl font-bold border-2 border-black"
       onClick={() => {
         if (!account) {
           activateBrowserWallet();
@@ -64,78 +59,78 @@ function WalletButton() {
   );
 }
 
-const Leaf: React.FC = () => {
-  const ac = useConnectedWalletAddressContext();
-  // console.log("Leaf render", ac);
-  let tokensRendered = 0;
-  if (ac === undefined) return null;
-  else return <div>
-    connected address: {ac.address}<br />
-    {allTokenKeys.map(tk => {
-      const tb = ac.tokenBalances[tk];
-      if (tb === undefined) return;
-      else {
-        tokensRendered += 1;
-        return <div key={tk}>
-          <RenderTokenBalance tokenBalance={tb} />
-        </div>;
-      }
-    })}
-    {tokensRendered < 1 && "(no token balances)"}
-  </div>;
-}
+// const Leaf: React.FC = () => {
+//   const ac = useConnectedWalletAddressContext();
+//   // console.log("Leaf render", ac);
+//   let tokensRendered = 0;
+//   if (ac === undefined) return null;
+//   else return <div>
+//     connected address: {ac.address}<br />
+//     {allTokenKeys.map(tk => {
+//       const tb = ac.tokenBalances[tk];
+//       if (tb === undefined) return;
+//       else {
+//         tokensRendered += 1;
+//         return <div key={tk}>
+//           <RenderTokenBalance tokenBalance={tb} />
+//         </div>;
+//       }
+//     })}
+//     {tokensRendered < 1 && "(no token balances)"}
+//   </div>;
+// }
 
-const Intermediate: React.FC = () => {
-  // const [num, setNum] = useState(0);
-  // useEffect(() => {
-  //   const intervalId = setInterval(() => {
-  //     setNum(n => n + 1);
-  //   }, 10000);
-  //   return () => clearInterval(intervalId);
-  // }, [setNum]);
-  // console.log("Intermediate render", num);
-  return <div>
-    {/*num % 2 === 0 &&*/ <Leaf /> /* here we flicker Leaf in and out of existence to test subscription clearing on unmount */}
-  </div>;
-}
+// const Intermediate: React.FC = () => {
+// const [num, setNum] = useState(0);
+// useEffect(() => {
+//   const intervalId = setInterval(() => {
+//     setNum(n => n + 1);
+//   }, 10000);
+//   return () => clearInterval(intervalId);
+// }, [setNum]);
+// console.log("Intermediate render", num);
+// return <div>
+// {/*num % 2 === 0 &&*/ <Leaf /> /* here we flicker Leaf in and out of existence to test subscription clearing on unmount */}
+// </div>;
+// }
 
-const testCheckout: Checkout = {
-  proposedAgreement: {
-    toAddress: '0xac0d7753EA2816501b57fae9ad665739018384b3',
-    logicalAssetTicker: 'USD',
-    amountAsBigNumberHexString: parseLogicalAssetAmount("30.12").toHexString(),
-    _p: false,
-    _rpp: true,
-  },
-  strategyPreferences: {
-    tokenTickerExclusions: ['USDC'],
-    chainIdExclusions: [42],
-  },
-};
+// const testCheckout: Checkout = {
+//   proposedAgreement: {
+//     toAddress: '0xac0d7753EA2816501b57fae9ad665739018384b3',
+//     logicalAssetTicker: 'USD',
+//     amountAsBigNumberHexString: parseLogicalAssetAmount("30.12").toHexString(),
+//     _p: false,
+//     _rpp: true,
+//   },
+//   strategyPreferences: {
+//     tokenTickerExclusions: ['USDC'],
+//     chainIdExclusions: [42],
+//   },
+// };
 
-function ProposedStrategyTest() {
-  const pss = getProposedStrategiesForProposedAgreement(testCheckout.strategyPreferences, testCheckout.proposedAgreement);
-  if (pss.length < 1) return <div>(no proposed strategies)</div>;
-  else return <div>
-    proposed strategies:
-    {pss.map(ps => <div key={getTokenKey(ps.receiverProposedTokenTransfer.token)}><RenderProposedStrategy ps={ps} /></div>)}
-  </div >;
-}
+// function ProposedStrategyTest() {
+//   const pss = getProposedStrategiesForProposedAgreement(testCheckout.strategyPreferences, testCheckout.proposedAgreement);
+//   if (pss.length < 1) return <div>(no proposed strategies)</div>;
+//   else return <div>
+//     proposed strategies:
+//     {pss.map(ps => <div key={getTokenKey(ps.receiverProposedTokenTransfer.token)}><RenderProposedStrategy ps={ps} /></div>)}
+//   </div >;
+// }
 
-function StrategyTest() {
-  const ac = useConnectedWalletAddressContext();
-  if (ac === undefined) return <div>no strategies because no wallet is connected</div>;
-  else if (isReceiverProposedPayment(testCheckout.proposedAgreement)) {
-    const ss = getStrategiesForAgreement(testCheckout.strategyPreferences, acceptReceiverProposedPayment(ac.address, testCheckout.proposedAgreement), ac);
-    if (ss.length < 1) return <div>(no strategies)</div>;
-    else return <div>
-      strategies:
-      {ss.map(s => <div key={getTokenKey(s.tokenTransfer.token)}>
-        <RenderStrategy s={s} />
-      </div>)}
-    </div >;
-  } else return <div>strategy test: unsupported agreement type</div>;
-}
+// function StrategyTest() {
+//   const ac = useConnectedWalletAddressContext();
+//   if (ac === undefined) return <div>no strategies because no wallet is connected</div>;
+//   else if (isReceiverProposedPayment(testCheckout.proposedAgreement)) {
+//     const ss = getStrategiesForAgreement(testCheckout.strategyPreferences, acceptReceiverProposedPayment(ac.address, testCheckout.proposedAgreement), ac);
+//     if (ss.length < 1) return <div>(no strategies)</div>;
+//     else return <div>
+//       strategies:
+//       {ss.map(s => <div key={getTokenKey(s.tokenTransfer.token)}>
+//         <RenderStrategy s={s} />
+//       </div>)}
+//     </div >;
+//   } else return <div>strategy test: unsupported agreement type</div>;
+// }
 
 function App() {
   // const maybeAddressOrENS = useAddressOrENS();
@@ -170,9 +165,17 @@ function App() {
   // const stakingBalance = useEtherBalance(STAKING_CONTRACT);
   // console.log('stakingBalance', stakingBalance && formatEther(stakingBalance));
 
+  const [checkout, setCheckout] = useState<Checkout | undefined>(undefined);
+  const [checkoutLink, setCheckoutLink] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (checkout !== undefined) setCheckoutLink(`https://3cities.xyz/#/pay?c=${serializeToModifiedBase64(checkout)}`); // TODO use current domain to build a relative checkout link; react-router may provide utils for this
+  }, [checkout, setCheckoutLink]);
+
   return (
     <Container>
       <Header>
+        <span className="font-bold">3cities&nbsp;&nbsp;&nbsp;&nbsp;</span>
         <WalletButton />
         {/* {ftb && <><br />first token balance: {formatEther(ftb)}</>} */}
         {/* {maybeAddressOrENS && <><br />connected: {maybeAddressOrENS}</>}
@@ -186,9 +189,14 @@ function App() {
         </div>)} */}
       </Header>
       <Body>
-        <Intermediate />
-        <ProposedStrategyTest />
-        <StrategyTest />
+        {checkout === undefined && <CheckoutEditor setResult={setCheckout} />}
+        {checkoutLink !== undefined && <div>
+          Share this link to request money:
+          {/* TODO copy to clipboard
+          TODO phone sharing API
+          TODO QR code */}
+          <p>{checkoutLink}</p>
+        </div>}
       </Body>
     </Container>
   );
