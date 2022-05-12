@@ -86,14 +86,14 @@ export const CheckoutStep2: React.FC<{ setResult: (r: CheckoutStep2Result) => vo
 
   // TODO delegate to StrategyPreferencesEditor
   return <div>
-    <br />
-    <span className="font-bold">Accepting these tokens:</span>
+    <br /><span className="font-bold">Accepting these tokens:</span>
     {allTokenTickers.map(tt => <div key={tt}><button style={{ minWidth: '12em', marginTop: '0.61em' }} className="font-bold border-2 border-black" onClick={toggleTokenTicker.bind(null, tt)}>{sp.tokenTickerExclusions !== undefined && sp.tokenTickerExclusions.indexOf(tt) > -1 && 'no '}{tt}</button></div>)}
     <div><button style={{ minWidth: '12em', marginTop: '0.61em' }} className="font-bold border-2 border-black" onClick={() => setUstEasterEgg(true)}>UST {ustEasterEgg && ' lol'}</button></div>
+
     <br /><span className="font-bold">On these chains:</span>
     {allChainIds.map(cid => <div key={cid}><button style={{ minWidth: '12em', marginTop: '0.61em' }} className="font-bold border-2 border-black" onClick={toggleChainId.bind(null, cid)}>{sp.chainIdExclusions !== undefined && sp.chainIdExclusions.indexOf(cid) > -1 && 'no '}{getChainName(cid)}</button></div>)}
     <br />(Click token/chain to disable)
-    <br /><br /><button className="text-1xl font-bold border-2 border-black" onClick={() => setResult({})}>Looks Good</button>
+    <br /><br /><button className="text-1xl font-bold border-2 border-black" onClick={() => setResult(sp)}>Looks Good</button>
   </div>;
 }
 
@@ -102,19 +102,16 @@ type CheckoutStep3Result = string // ie. Payment.toAddress
 export const CheckoutStep3: React.FC<{ setResult: (r: CheckoutStep3Result) => void }> = ({ setResult }) => {
   // TODO delegate to AddressPicker reusable component that lets you type in an address, ENS, or connect wallet to provide one
   const { account } = useEthers();
-  const [address, setAddress] = useState<string | undefined>(typeof account === 'string' ? account : undefined);
+  const [address, setAddress] = useState<string>(typeof account === 'string' ? account : '');
 
   useEffect(() => {
-    if (address === undefined && typeof account === 'string') setAddress(account);
+    if (address.length < 1 && typeof account === 'string') setAddress(account);
   }, [account, address, setAddress])
 
   return <div>
     <br /><label className="font-bold" htmlFor="address">Address to receive money (no ENS yet):</label>
-    <br /><input style={{ width: '100%' }} id="address" type="text" placeholder={"0x123... or connect wallet"} onChange={(e) => {
-      if (e.target.value.length > 0) setAddress(e.target.value);
-      else setAddress(undefined);
-    }} value={address}></input>
-    <br /><br /><button className={`text-1xl font-bold border-2 ${address !== undefined ? 'border-black' : 'border-grey-600 font-extralight'}`} disabled={address === undefined} onClick={() => { if (address !== undefined) /* TODO address validation, ensure it's at least a well-formed addressed, ENS resolves, etc. */ setResult(address) }}>Done</button>
+    <br /><input style={{ width: '100%' }} id="address" type="text" placeholder={"0x123... or connect wallet"} onChange={(e) => setAddress(e.target.value)} value={address}></input>
+    <br /><br /><button className={`text-1xl font-bold border-2 ${address.length > 0 ? 'border-black' : 'border-grey-600 font-extralight'}`} disabled={address.length < 1} onClick={() => { if (address.length > 0) /* TODO address validation, ensure it's at least a well-formed addressed, ENS resolves, etc. */ setResult(address) }}>Done</button>
   </div>;
 }
 
