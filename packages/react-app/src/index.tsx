@@ -2,9 +2,11 @@ import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import { DAppProvider } from "@usedapp/core";
 import React from "react";
 import { createRoot } from "react-dom/client";
+import { HashRouter, Route, Routes } from "react-router-dom";
 import App from "./App";
 import { ConnectedWalletAddressContextObserverProvider } from "./connectedWalletContextProvider";
 import "./index.css";
+import { Pay } from "./Pay";
 import { config } from "./usedappConfig";
 
 // You should replace this url with your own and put it into a .env file
@@ -26,7 +28,13 @@ root.render(
     <DAppProvider config={config} >
       <ConnectedWalletAddressContextObserverProvider>
         <ApolloProvider client={client} >
-          <App />
+          <HashRouter>
+            <Routes>
+              {/* TODO refactor this to use react-router's nested routers and Outlet where there's a single App component that contains the Container/Header/WalletButton and Pay is rendered into an outlet */}
+              <Route path="/" element={<App />} />
+              <Route path="/pay" element={<Pay />} />
+            </Routes>
+          </HashRouter>
         </ApolloProvider>
       </ConnectedWalletAddressContextObserverProvider>
     </DAppProvider>
