@@ -162,6 +162,9 @@ export const tokensByTicker: Readonly<{ [ticker: string]: NonEmptyArray<NativeCu
   return r;
 })();
 
+// allTokenTickers is the set of all token tickers we support
+export const allTokenTickers = Object.keys(tokensByTicker);
+
 // getTokenByTokenKey returns a NativeCurrency or Token for the passed
 // TokenKey. For convenience, getTokenByTokenKey is a partial function
 // that throws an error if the passed TokenKey is not found in the

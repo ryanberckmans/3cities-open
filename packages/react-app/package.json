@@ -25,6 +25,7 @@
     "graphql": "^16.3.0",
     "immer": "^9.0.12",
     "react": "^18.1.0",
+    "react-currency-input-field": "^3.6.4",
     "react-dom": "^18.1.0",
     "use-immer": "^0.7.0"
   },
