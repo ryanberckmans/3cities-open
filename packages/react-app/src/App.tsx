@@ -1,9 +1,11 @@
 import { shortenAddress, useEthers, useLookupAddress } from "@usedapp/core";
 import React, { useEffect, useState } from "react";
+import useClipboard from "react-use-clipboard";
 import { Checkout } from "./checkout";
 import { CheckoutEditor } from "./CheckoutEditor";
 import { Body, Container, Header } from "./components";
 import { serializeToModifiedBase64 } from "./serialize";
+
 // import { useConnectedWalletAddressContext } from "./connectedWalletContextProvider";
 
 // Old imports:
@@ -169,8 +171,12 @@ function App() {
   const [checkoutLink, setCheckoutLink] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    if (checkout !== undefined) setCheckoutLink(`https://3cities.xyz/#/pay?c=${serializeToModifiedBase64(checkout)}`); // TODO use current domain to build a relative checkout link; react-router may provide utils for this
+    if (checkout !== undefined) setCheckoutLink(`${location.origin}/#/pay?c=${serializeToModifiedBase64(checkout)}`); // TODO use current domain to build a relative checkout link; react-router may provide utils for this
   }, [checkout, setCheckoutLink]);
+
+  const [isCopied, setCopied] = useClipboard(checkoutLink || '', {
+    successDuration: 5000, // `isCopied` will go back to `false` after 5000ms
+  });
 
   return (
     <Container>
@@ -191,11 +197,19 @@ function App() {
       <Body>
         {checkout === undefined && <CheckoutEditor setResult={setCheckout} />}
         {checkoutLink !== undefined && <div>
-          Share this link to request money:
-          {/* TODO copy to clipboard
-          TODO phone sharing API
-          TODO QR code */}
-          <p>{checkoutLink}</p>
+          <br /><span className="font-bold">Share this link to request money:</span>
+          <br /><br /><br /><br />
+          <div className="flex justify-center">
+            <div>
+              {navigator.share !== undefined ? <button className="text-4xl font-bold border-2 border-black" onClick={() => {
+                navigator.share({ url: checkoutLink })
+              }}>
+                Share Link
+              </button> : <span><button className="text-4xl font-bold border-2 border-black" onClick={setCopied}>
+                Copy Link
+              </button><br />{isCopied && ' copied'} </span>}
+            </div>
+          </div>
         </div>}
       </Body>
     </Container>
