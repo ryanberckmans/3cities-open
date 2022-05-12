@@ -142,7 +142,9 @@ function App() {
   return (
     <Container>
       <Header>
-        <span className="font-bold">3cities&nbsp;&nbsp;&nbsp;&nbsp;</span>
+        <a href="/"> {/* here I tried to use a <Link reloadDocument> but it didn't seem to have my intended effect of forcing a page reload to reset state, so I switched to <a> */}
+          <span className="font-bold">3cities&nbsp;&nbsp;&nbsp;&nbsp;</span>
+        </a>
         <WalletButton />
         {/* {ftb && <><br />first token balance: {formatEther(ftb)}</>} */}
         {/* {maybeAddressOrENS && <><br />connected: {maybeAddressOrENS}</>}
