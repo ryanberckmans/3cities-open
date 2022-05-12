@@ -10,6 +10,7 @@ import { RenderStrategy } from "./RenderStrategy";
 import { deserializeFromModifiedBase64 } from "./serialize";
 import { getProposedStrategiesForProposedAgreement, getStrategiesForAgreement } from "./strategies";
 import { getTokenKey } from "./tokens";
+import { ExecuteTokenTransferButton } from "./transactions";
 import { WalletButton } from "./WalletButton";
 
 export const Pay: React.FC = () => {
@@ -68,7 +69,10 @@ export const Pay: React.FC = () => {
                 <br />No payment options for the connected wallet.
                 <br />Please disconnect your wallet to see the available tokens and chains. </div>;
               else return ss.map(s => <div key={getTokenKey(s.tokenTransfer.token)}>
-                <br /><RenderStrategy s={s} />
+                <br />
+                <RenderStrategy s={s} />
+                &nbsp;
+                <ExecuteTokenTransferButton tt={s.tokenTransfer}/>
               </div>);
             })()}
           </div>}
