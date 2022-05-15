@@ -60,7 +60,6 @@ type CheckoutStep2Result = StrategyPreferences
 
 export const CheckoutStep2: React.FC<{ setResult: (r: CheckoutStep2Result) => void }> = ({ setResult }) => {
   const [sp, setSp] = useImmer<StrategyPreferences>({});
-  const [ustEasterEgg, setUstEasterEgg] = useState(false);
 
   const toggleTokenTicker = (tt: string) => {
     setSp(draft => {
@@ -88,7 +87,6 @@ export const CheckoutStep2: React.FC<{ setResult: (r: CheckoutStep2Result) => vo
   return <div>
     <br /><span className="font-bold">Accepting these tokens:</span>
     {allTokenTickers.map(tt => <div key={tt}><button style={{ minWidth: '12em', marginTop: '0.61em' }} className="font-bold border-2 border-black" onClick={toggleTokenTicker.bind(null, tt)}>{sp.tokenTickerExclusions !== undefined && sp.tokenTickerExclusions.indexOf(tt) > -1 && 'no '}{tt}</button></div>)}
-    <div><button style={{ minWidth: '12em', marginTop: '0.61em' }} className="font-bold border-2 border-black" onClick={() => setUstEasterEgg(true)}>UST {ustEasterEgg && ' lol'}</button></div>
 
     <br /><span className="font-bold">On these chains:</span>
     {allChainIds.map(cid => <div key={cid}><button style={{ minWidth: '12em', marginTop: '0.61em' }} className="font-bold border-2 border-black" onClick={toggleChainId.bind(null, cid)}>{sp.chainIdExclusions !== undefined && sp.chainIdExclusions.indexOf(cid) > -1 && 'no '}{getChainName(cid)}</button></div>)}
