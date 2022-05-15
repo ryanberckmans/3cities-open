@@ -56,29 +56,25 @@ const addEthereumChainParameterByChainId: { [chainId: number]: AddEthereumChainP
   },
 };
 
-export async function switchNetwork(provider: JsonRpcProvider, chainId: number) {
+// switchNetwork switches the user's wallet to the destination network
+// identified by the passed chainId, adding the new network to the
+// user's wallet if necessary. The returned Promise resolves if the
+// network switch was successful, rejects otherwise.
+export async function switchNetwork(provider: JsonRpcProvider, chainId: number): Promise<void> {
   try {
-    await provider.send('wallet_switchEthereumChain', [{ chainId: `0x${chainId.toString(16)}` }]);
+    await provider.send('wallet_switchEthereumChain', [{ chainId: `0x${chainId.toString(16)}` }]); // NB the wallet_switchEthereumChain Promise rejects if the user declines the network switch or the destination chainId is unknown to the user's wallet
   } catch (error) {
-    // 4902 is the error code for attempting to switch to an unrecognized chainId
     const p = addEthereumChainParameterByChainId[chainId];
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if (typeof error === 'object' && (error as any).code === 4902 && p !== undefined) {
+    if (typeof error === 'object' && (error as any).code === 4902 && p !== undefined) { // 4902 is the error code for attempting to switch to an unrecognized chainId
       await provider.send('wallet_addEthereumChain', [{
         chainId: p.chainId,
         chainName: p.chainName,
         rpcUrls: p.rpcUrls,
         nativeCurrency: p.nativeCurrency,
         blockExplorerUrls: p.blockExplorerUrls,
-      }]);
-      // metamask (only known implementer) automatically switches after a network is added
-      // the second call is done here because that behavior is not a part of the spec and cannot be relied upon in the future
-      // metamask's behavior when switching to the current network is just to return null (a no-op)
-      try {
-        await provider.send('wallet_switchEthereumChain', [{ chainId: `0x${chainId.toString(16)}` }]);
-      } catch (error) {
-        console.debug('Added network but could not switch chains', error);
-      }
+      }]); // NB the wallet_switchEthereumChain Promise rejects if the user declines to add the new network
+      await provider.send('wallet_switchEthereumChain', [{ chainId: `0x${chainId.toString(16)}` }]); // metamask (only known implementer) automatically switches after a network is added, so we execute another wallet_switchEthereumChain here because metamask's behavior of auto-switching to a newly added network is not part of the spec and so we want to auto-switch to the new network for wallets in compliance with the spec. Note that metamask's behavior when switching to the currently-active network is a no-op, ie. the promise resolves
     } else {
       // error wasn't due to an attempt to switch to an unrecognized network, so we re-throw it
       throw error;
