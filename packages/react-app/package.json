@@ -67,7 +67,7 @@
     "build:prod": "npx env-cmd -e prod npm run build-raw",
     "build": "yarn build:prod",
     "eject": "react-scripts eject",
-    "ipfs": "yarn build && ipfs-deploy build/ --pinner infura --dns cloudflare # requires env vars IPFS_DEPLOY_CLOUDFLARE__API_TOKEN, IPFS_DEPLOY_CLOUDFLARE__ZONE, IPFS_DEPLOY_CLOUDFLARE__RECORD",
+    "ipfs": "yarn build && ipfs-deploy build/ --pinner infura --pinner pinata --dns cloudflare # requires env vars IPFS_DEPLOY_CLOUDFLARE__API_TOKEN, IPFS_DEPLOY_CLOUDFLARE__ZONE, IPFS_DEPLOY_CLOUDFLARE__RECORD, IPFS_DEPLOY_PINATA__API_KEY, IPFS_DEPLOY_PINATA__SECRET_API_KEY",
     "start-raw": "react-scripts start # run dev mode in the context of an env that's already been set",
     "start:dev": "yarn env-cmd -e dev yarn start-raw",
     "start:prod-test": "yarn env-cmd -e prod-test yarn start-raw",
