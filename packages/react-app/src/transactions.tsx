@@ -6,6 +6,7 @@ import React from "react";
 import { switchNetwork } from "./switchNetwork";
 import { isToken } from "./tokens";
 import { TokenTransfer } from "./tokenTransfer";
+import { allChainIds } from "./usedappConfig";
 
 type ExecuteTokenTransferButtonProps = {
   tt: TokenTransfer;
@@ -50,19 +51,30 @@ function useExecuteTokenTransfer(tt: TokenTransfer & {
   state: TransactionStatus;
   execute: () => void;
 } {
-  const { account, library, chainId } = useEthers();
+  const { account, library } = useEthers();
   const c: Contract = new Contract(tt.token.address, abis.erc20, library);
-  const { send, state } = useContractFunction(c, 'transfer');
+  const { send: unsafeSend, state } = useContractFunction(c, 'transfer');
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const safeSend: (...args: any[]) => Promise<void> = async (...args) => {
+    if (library === undefined) return Promise.reject("safeSend: provider undefined");
+    else {
+      const { chainId } = await library.getNetwork(); // here we fetch an up-to-date chainId from the provider so as to ensure we're checking the safety of the chainId that's actually active instead of using a chainId cached in this component's state, which may be stale by the time this callback is invoked
+      if (chainId !== undefined && allChainIds.includes(chainId)) return unsafeSend(...args);
+      else return Promise.reject(`safeSend: refusing to send a transaction on chainId=${chainId} because this chainId was not in the global list of active chainIds, which may indicate the user is about to sign a production transaction in a test context (eg. accidentally spend real ETH while in test mode)`);
+    }
+  }
   return {
     state,
-    execute: () => {
-      if (account === tt.fromAddress) { // WARNING here we treat TokenTransfer execution as a no-op if the current connected wallet address (which is the implicit sender of the tx) is not equal to the fromAddress in the tokenTransfer. TODO I'm not sure what to do here-- strategies can only be computed in the context of a fromAddress, but after they have been computed, they seem to execute in the context of whatever connected wallet. And that strategy's transaction could fail at runtime in the wallet if the token balance isn't present, eg. if the user's active wallet isn't the same one for which the strategies were computed or if the wallet's token balances have become stale and the transfer has become unaffordable
-        if (chainId === undefined) {
-          console.warn("useExecuteTokenTransfer: connected wallet chainId was unexpectedly undefined");
-        } else if (chainId !== tt.token.chainId && library !== undefined) {
+    execute: async () => {
+      if (library === undefined) return Promise.reject("useExecuteTokenTransfer: provider undefined");
+      else if (account !== tt.fromAddress) return Promise.reject(`useExecuteTokenTransfer: currently connected wallet=${account} is as different address than TokenTransfer.fromAddress=${tt.fromAddress}`); // WARNING here we treat TokenTransfer execution as a no-op if the current connected wallet address (which is the implicit sender of the tx) is not equal to the fromAddress in the tokenTransfer. TODO I'm not sure what to do here-- strategies can only be computed in the context of a fromAddress, but after they have been computed, they seem to execute in the context of whatever connected wallet. And that strategy's transaction could fail at runtime in the wallet if the token balance isn't present, eg. if the user's active wallet isn't the same one for which the strategies were computed or if the wallet's token balances have become stale and the transfer has become unaffordable
+      else {
+        const { chainId } = await library.getNetwork(); // here we fetch an up-to-date chainId from the provider so as to ensure we're using the chainId that's actually active instead of using a chainId cached in this component's state, which may be stale by the time this callback is invoked
+        if (chainId === undefined) return Promise.reject("useExecuteTokenTransfer: connected wallet chainId was unexpectedly undefined");
+        else if (chainId !== tt.token.chainId) {
           // The connected wallet's selected network is not the same network as the token transfer is on. We'll pop up a network switch request, and user will then have to click the Pay button again after switching network
-          switchNetwork(library, tt.token.chainId);
-        } else send(tt.toAddress, BigNumber.from(tt.amountAsBigNumberHexString));
+          switchNetwork(library, tt.token.chainId).then(() => safeSend(tt.toAddress, BigNumber.from(tt.amountAsBigNumberHexString)));
+        } else safeSend(tt.toAddress, BigNumber.from(tt.amountAsBigNumberHexString));
       }
     },
   };
