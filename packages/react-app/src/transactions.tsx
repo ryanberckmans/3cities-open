@@ -3,6 +3,7 @@ import { BigNumber } from "@ethersproject/bignumber";
 import { Contract } from "@ethersproject/contracts";
 import { Token, TransactionStatus, useContractFunction, useEthers } from "@usedapp/core";
 import React from "react";
+import { switchNetwork } from "./switchNetwork";
 import { isToken } from "./tokens";
 import { TokenTransfer } from "./tokenTransfer";
 
@@ -49,7 +50,7 @@ function useExecuteTokenTransfer(tt: TokenTransfer & {
   state: TransactionStatus;
   execute: () => void;
 } {
-  const { account, library, chainId, switchNetwork } = useEthers();
+  const { account, library, chainId } = useEthers();
   const c: Contract = new Contract(tt.token.address, abis.erc20, library);
   const { send, state } = useContractFunction(c, 'transfer');
   return {
@@ -58,9 +59,9 @@ function useExecuteTokenTransfer(tt: TokenTransfer & {
       if (account === tt.fromAddress) { // WARNING here we treat TokenTransfer execution as a no-op if the current connected wallet address (which is the implicit sender of the tx) is not equal to the fromAddress in the tokenTransfer. TODO I'm not sure what to do here-- strategies can only be computed in the context of a fromAddress, but after they have been computed, they seem to execute in the context of whatever connected wallet. And that strategy's transaction could fail at runtime in the wallet if the token balance isn't present, eg. if the user's active wallet isn't the same one for which the strategies were computed or if the wallet's token balances have become stale and the transfer has become unaffordable
         if (chainId === undefined) {
           console.warn("useExecuteTokenTransfer: connected wallet chainId was unexpectedly undefined");
-        } else if (chainId !== tt.token.chainId) {
+        } else if (chainId !== tt.token.chainId && library !== undefined) {
           // The connected wallet's selected network is not the same network as the token transfer is on. We'll pop up a network switch request, and user will then have to click the Pay button again after switching network
-          switchNetwork(tt.token.chainId);
+          switchNetwork(library, tt.token.chainId);
         } else send(tt.toAddress, BigNumber.from(tt.amountAsBigNumberHexString));
       }
     },
