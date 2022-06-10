@@ -6,7 +6,7 @@ const INFURA_PROJECT_ID = "defba93b47f748f09fcead8282b9e58e"; // TODO get our ow
 const readOnlyChainId: number = isProduction ? Mainnet.chainId : Kovan.chainId;
 
 const readOnlyUrls: NodeUrls = isProduction ? {
-  [Mainnet.chainId]: `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
+  [Mainnet.chainId]: `https://eth-mainnet.alchemyapi.io/v2/Ol1s45gSHsu__OExc-Yh1bfxt-DVJMXq`,
   [Optimism.chainId]: 'https://mainnet.optimism.io', // NB Optimism guidance is that this endpoint is not for production systems. They ask that you get your own optimism endpoint from Alchemy or Infura
   [Arbitrum.chainId]: 'https://arb1.arbitrum.io/rpc',
 } : {
