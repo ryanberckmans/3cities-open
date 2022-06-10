@@ -29,7 +29,8 @@ const ExecuteTokenTransferButtonInternal: React.FC<ExecuteTokenTransferButtonInt
 
   const isDisabled =
     state.status == 'PendingSignature' ||
-    state.status == 'Mining';
+    state.status == 'Mining' ||
+    state.status == 'Success';
 
   const statusNote: string = (() => {
     switch (state.status) {
@@ -42,7 +43,7 @@ const ExecuteTokenTransferButtonInternal: React.FC<ExecuteTokenTransferButtonInt
     }
   })();
 
-  return <button disabled={isDisabled} className={`font-bold border-2 ${!isDisabled ? 'border-black' : 'border-grey-600 font-extralight'}`} onClick={execute}>Pay Now{statusNote}</button>;
+  return <button disabled={isDisabled} className={`rounded-md bg-gradient-to-br from-violet-500 to-blue-500 px-3.5 py-2 text-sm font-medium transition hover:hue-rotate-30 active:scale-95 active:hue-rotate-60 ${isDisabled ? 'border-black text-grey' : 'text-white'}`} onClick={execute}>Pay Now{statusNote}</button>;
 }
 
 function useExecuteTokenTransfer(tt: TokenTransfer & {

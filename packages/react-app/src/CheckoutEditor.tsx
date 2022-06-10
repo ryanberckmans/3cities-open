@@ -20,31 +20,44 @@ export const CheckoutStep1: React.FC<{ setResult: (r: CheckoutStep1Result) => vo
   const [amount, setAmount] = useState<number | undefined>(undefined);
   const [note, setNote] = useState<string>('');
 
-  return <div>
-    <br /><span className="font-bold">Request Money</span>
-    <br /><br /><label className="font-bold" htmlFor="amount">Amount: &nbsp;</label>
-    <CurrencyInput
-      id="amount"
-      name="amount"
-      placeholder="how much?"
-      prefix="$"
-      allowNegativeValue={false}
-      defaultValue={0}
-      decimalsLimit={2}
-      onValueChange={(vs) => {
-        if (vs === undefined) setAmount(undefined)
-        else try {
-          const v = parseFloat(vs);
-          if (v > 0) setAmount(v);
-          else setAmount(undefined);
-        } catch (err) {
-          console.warn(err);
-        }
-      }}
-    />
-    <br /><br /><label className="font-bold" htmlFor="note">For what?&nbsp;</label>
-    <input id="note" type="text" placeholder={"(optional)"} onChange={(e) => setNote(e.target.value)} value={note}></input>
-    <br /><br /><button className={`text-1xl font-bold border-2 ${amount !== undefined ? 'border-black' : 'border-grey-600 font-extralight'}`} onClick={() => {
+  const isSubmitButtonDisabled: boolean = amount === undefined;
+
+  return <form className="flex w-full flex-col items-center gap-5">
+    <div className="flex w-full items-center gap-5">
+      <div className="flex w-1/3 flex-col">
+        <label className="mb-1.5 text-sm font-medium text-neutral-600" htmlFor="amount">Amount</label>
+        <CurrencyInput
+          className="w-full rounded-md border px-3.5 py-2"
+          id="amount"
+          name="amount"
+          placeholder="how much?"
+          prefix="$"
+          allowNegativeValue={false}
+          defaultValue={0}
+          decimalsLimit={2}
+          onValueChange={(vs) => {
+            if (vs === undefined) setAmount(undefined)
+            else try {
+              const v = parseFloat(vs);
+              if (v > 0) setAmount(v);
+              else setAmount(undefined);
+            } catch (err) {
+              console.warn(err);
+            }
+          }}
+        />
+      </div>
+      <div className="flex w-2/3 flex-col">
+        <label
+          className="mb-1.5 text-sm font-medium text-neutral-600"
+          htmlFor="note"
+        >
+          For what?
+        </label>
+        <input className="w-full rounded-md border px-3.5 py-2" id="note" type="text" placeholder="(optional)" onChange={(e) => setNote(e.target.value)} value={note}></input>
+      </div>
+    </div>
+    <button className="w-full rounded-md bg-gradient-to-br from-violet-500 to-blue-500 px-3.5 py-2 text-sm font-medium text-white transition hover:hue-rotate-30 active:scale-95 active:hue-rotate-60 disabled:opacity-50" onClick={() => {
       if (amount !== undefined) {
         const p = {
           logicalAssetTicker: 'USD' as LogicalAssetTicker, // TODO support ETH
@@ -52,8 +65,8 @@ export const CheckoutStep1: React.FC<{ setResult: (r: CheckoutStep1Result) => vo
         };
         setResult(note === '' ? p : Object.assign({ note }, p));
       }
-    }} disabled={amount === undefined}>Request</button>
-  </div>
+    }} disabled={isSubmitButtonDisabled}>Request</button>
+  </form>;
 }
 
 type CheckoutStep2Result = StrategyPreferences
@@ -84,14 +97,30 @@ export const CheckoutStep2: React.FC<{ setResult: (r: CheckoutStep2Result) => vo
   }
 
   // TODO delegate to StrategyPreferencesEditor
-  return <div>
-    <br /><span className="font-bold">Accepting these tokens:</span>
-    {allTokenTickers.map(tt => <div key={tt}><button style={{ minWidth: '12em', marginTop: '0.61em' }} className="font-bold border-2 border-black" onClick={toggleTokenTicker.bind(null, tt)}>{sp.tokenTickerExclusions !== undefined && sp.tokenTickerExclusions.indexOf(tt) > -1 && 'no '}{tt}</button></div>)}
-
-    <br /><span className="font-bold">On these chains:</span>
-    {allChainIds.map(cid => <div key={cid}><button style={{ minWidth: '12em', marginTop: '0.61em' }} className="font-bold border-2 border-black" onClick={toggleChainId.bind(null, cid)}>{sp.chainIdExclusions !== undefined && sp.chainIdExclusions.indexOf(cid) > -1 && 'no '}{getChainName(cid)}</button></div>)}
-    <br />(Click token/chain to disable)
-    <br /><br /><button className="text-1xl font-bold border-2 border-black" onClick={() => setResult(sp)}>Looks Good</button>
+  // TODO disable submit button if no tokens or no chains are selected
+  return <div className="space-y-5">
+    <div>
+      <h3 className="mb-1.5 text-sm text-neutral-600 font-medium">
+        Accepting these tokens:
+      </h3>
+      <div className="flex flex-wrap gap-2.5">
+        {allTokenTickers.map(tt => <div key={tt}><button className="font-medium px-3.5 py-2 border rounded-md inline-flex justify-start hover:border-gray-300 focus:border-white focus:bg-gradient-to-br focus:from-violet-500 focus:to-blue-500 focus:text-white" onClick={toggleTokenTicker.bind(null, tt)}>{sp.tokenTickerExclusions !== undefined && sp.tokenTickerExclusions.indexOf(tt) > -1 && 'no '}{tt}</button></div>)}
+      </div>
+    </div>
+    <div>
+      <h3 className="mb-1.5 text-sm text-neutral-600 font-medium">
+        On these chains:
+      </h3>
+      <div className="flex flex-wrap gap-2.5">
+        {allChainIds.map(cid => <div key={cid}><button className="font-medium px-3.5 py-2 border rounded-md inline-flex justify-start hover:border-gray-300 focus:border-white focus:bg-gradient-to-br focus:from-violet-500 focus:to-blue-500 focus:text-white" onClick={toggleChainId.bind(null, cid)}>{sp.chainIdExclusions !== undefined && sp.chainIdExclusions.indexOf(cid) > -1 && 'no '}{getChainName(cid)}</button></div>)}
+      </div>
+    </div>
+    <div>
+      <h3 className="mb-1.5 text-sm text-neutral-600 font-medium">
+        (Click token/chain to disable)
+      </h3>
+    </div>
+    <button className="text-sm font-medium px-3.5 py-2 bg-gradient-to-br from-violet-500 to-blue-500 rounded-md text-white hover:hue-rotate-30 active:hue-rotate-60 transition active:scale-95 w-full" onClick={() => setResult(sp)}>Looks Good</button>
   </div>;
 }
 
@@ -106,11 +135,16 @@ export const CheckoutStep3: React.FC<{ setResult: (r: CheckoutStep3Result) => vo
     if (address.length < 1 && typeof account === 'string') setAddress(account);
   }, [account, address, setAddress])
 
-  return <div>
-    <br /><label className="font-bold" htmlFor="address">Address to receive money (no ENS yet):</label>
-    <br /><input style={{ width: '100%' }} id="address" type="text" placeholder={"0x123... or connect wallet"} onChange={(e) => setAddress(e.target.value)} value={address}></input>
-    <br /><br /><button className={`text-1xl font-bold border-2 ${address.length > 0 ? 'border-black' : 'border-grey-600 font-extralight'}`} disabled={address.length < 1} onClick={() => { if (address.length > 0) /* TODO address validation, ensure it's at least a well-formed addressed, ENS resolves, etc. */ setResult(address) }}>Done</button>
-  </div>;
+
+  return <form className="flex w-full flex-col items-center gap-5">
+    <div className="flex w-full items-center gap-5">
+      <div className="flex flex-col">
+        <label className="mb-1.5 text-sm font-medium text-neutral-600" htmlFor="address">Address to receive money (ENS coming soon):</label>
+        <input className="w-full rounded-md border px-3.5 py-2" id="address" type="text" placeholder="0x123... or connect wallet" onChange={(e) => setAddress(e.target.value)} value={address}></input>
+      </div>
+    </div>
+    <button className="w-full rounded-md bg-gradient-to-br from-violet-500 to-blue-500 px-3.5 py-2 text-sm font-medium text-white transition hover:hue-rotate-30 active:scale-95 active:hue-rotate-60 disabled:opacity-50" disabled={address.length < 1} onClick={() => { if (address.length > 0) /* TODO address validation, ensure it's at least a well-formed addressed, ENS resolves, etc. */ setResult(address) }}>Done</button>
+  </form>;
 }
 
 export const CheckoutEditor: React.FC<{ setResult: (r: Checkout) => void }> = ({ setResult }) => {

@@ -2,9 +2,8 @@ import React, { useEffect, useState } from "react";
 import useClipboard from "react-use-clipboard";
 import { Checkout } from "./checkout";
 import { CheckoutEditor } from "./CheckoutEditor";
-import { Body, Container, Header } from "./components";
+import { ContentWrapper } from "./ContentWrapper";
 import { serializeToModifiedBase64 } from "./serialize";
-import { WalletButton } from "./WalletButton";
 
 // import { useConnectedWalletAddressContext } from "./connectedWalletContextProvider";
 
@@ -140,42 +139,22 @@ function App() {
   });
 
   return (
-    <Container>
-      <Header>
-        <a href="/"> {/* here I tried to use a <Link reloadDocument> but it didn't seem to have my intended effect of forcing a page reload to reset state, so I switched to <a> */}
-          <span className="font-bold">3cities&nbsp;&nbsp;&nbsp;&nbsp;</span>
-        </a>
-        <WalletButton />
-        {/* {ftb && <><br />first token balance: {formatEther(ftb)}</>} */}
-        {/* {maybeAddressOrENS && <><br />connected: {maybeAddressOrENS}</>}
-        {firstNativeCurrencyBalance && <><br />first native currency balance: {formatEther(firstNativeCurrencyBalance)}</>}
-        {firstTokenBalance && <><br />first token balance: {formatEther(firstTokenBalance)}</>}
-        {maybeAddressOrENS && nativeCurrencies.map(nc => <div key={`${nc.ticker} ${nc.chainId}`}>
-          <TokenBalance nativeCurrencyOrToken={nc} address={maybeAddressOrENS} key={`${nc.ticker} ${nc.chainId}`} />
-        </div>)}
-        {maybeAddressOrENS && tokens.map(nc => <div key={`${nc.ticker} ${nc.chainId}`}>
-          <TokenBalance nativeCurrencyOrToken={nc} address={maybeAddressOrENS} key={`${nc.ticker} ${nc.chainId}`} />
-        </div>)} */}
-      </Header>
-      <Body>
-        {checkout === undefined && <CheckoutEditor setResult={setCheckout} />}
-        {checkoutLink !== undefined && <div>
-          <br /><span className="font-bold">Share this link to request money:</span>
-          <br /><br />
-          <div className="flex justify-center">
-            <div>
-              {navigator.share !== undefined ? <button className="text-4xl font-bold border-2 border-black" onClick={() => {
-                navigator.share({ url: checkoutLink })
-              }}>
-                Share Link
-              </button> : <span><button className="text-4xl font-bold border-2 border-black" onClick={setCopied}>
-                Copy Link
-              </button><br />{isCopied && ' copied'} </span>}
-            </div>
+    <ContentWrapper heading={checkoutLink === undefined ? "Request Money" : "Share this link to request money:"}>
+      {checkout === undefined && <CheckoutEditor setResult={setCheckout} />}
+      {checkoutLink !== undefined && <div>
+        <div className="flex justify-center">
+          <div>
+            {navigator.share !== undefined ? <button className="text-4xl w-full rounded-md bg-gradient-to-br from-violet-500 to-blue-500 px-3.5 py-2 font-medium text-white transition hover:hue-rotate-30 active:scale-95 active:hue-rotate-60" onClick={() => {
+              navigator.share({ url: checkoutLink })
+            }}>
+              Share Link
+            </button> : <button className="text-4xl w-full rounded-md bg-gradient-to-br from-violet-500 to-blue-500 px-3.5 py-2 font-medium text-white transition hover:hue-rotate-30 active:scale-95 active:hue-rotate-60" onClick={setCopied}>
+              {isCopied ? 'Copied' : 'Copy Link'}
+            </button>}
           </div>
-        </div>}
-      </Body>
-    </Container>
+        </div>
+      </div>}
+    </ContentWrapper>
   );
 }
 

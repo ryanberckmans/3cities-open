@@ -7,6 +7,7 @@ import App from "./App";
 import { buildGitCommit, buildGitCommitDate, buildPackageJsonVersion } from "./buildInfo";
 import { ConnectedWalletAddressContextObserverProvider } from "./connectedWalletContextProvider";
 import "./index.css";
+import { MainWrapper } from "./MainWrapper";
 import { Pay } from "./Pay";
 import { config } from "./usedappConfig";
 
@@ -30,12 +31,14 @@ root.render(
       <ConnectedWalletAddressContextObserverProvider>
         <ApolloProvider client={client} >
           <HashRouter>
-            <Routes>
-              {/* TODO refactor this to use react-router's nested routers and Outlet where there's a single App component that contains the Container/Header/WalletButton and Pay is rendered into an outlet */}
-              <Route path="/" element={<App />} />
-              <Route path="/pay" element={<Pay />} />
-              <Route path="/build" element={<span><Link to="/">3cities</Link> v{buildPackageJsonVersion} {buildGitCommit} {buildGitCommitDate}</span>} />
-            </Routes>
+            <MainWrapper>
+              <Routes>
+                {/* TODO refactor this to use react-router's nested routers and Outlet where there's a single App component that contains the Container/Header/WalletButton and Pay is rendered into an outlet */}
+                <Route path="/" element={<App />} />
+                <Route path="/pay" element={<Pay />} />
+                <Route path="/build" element={<span><Link to="/">3cities</Link> v{buildPackageJsonVersion} {buildGitCommit} {buildGitCommitDate}</span>} />
+              </Routes>
+            </MainWrapper>
           </HashRouter>
         </ApolloProvider>
       </ConnectedWalletAddressContextObserverProvider>
