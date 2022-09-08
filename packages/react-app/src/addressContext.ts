@@ -2,9 +2,14 @@ import { BigNumber } from "@ethersproject/bignumber";
 import { TokenBalance } from "./tokenBalance";
 import { TokenKey } from "./tokens";
 
+// AddressContext is a snapshot of a single wallet address's
+// state at a given point in time. Right now, the typical job
+// of AddressContext in 3cities is to hold the latest up-to-date
+// (block by block streaming updates) wallet token balances for
+// all supported tokens on all supported L2s and the L1.
 export type AddressContext = Readonly<{
-  address: string;
-  tokenBalances: { [tk: TokenKey]: TokenBalance }
+  address: string; // the address for which this AddressContext is the snapshot
+  tokenBalances: { [tk: TokenKey]: TokenBalance } // snapshot of token balances for this address (typically, balances for all (tokens X L2s) in one AddressContext)
 }>
 
 // emptyAddressContext is a convenience and safety function to
